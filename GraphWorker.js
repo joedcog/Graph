@@ -1,7 +1,7 @@
 self.addEventListener('message', function(e) {
-  console.log(e.data.a);
-  console.log(e.data.b);
-  console.log(e.data.N);
+  // console.log(e.data.a);
+  // console.log(e.data.b);
+  // console.log(e.data.N);
   importScripts('https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.7.0/math.js');
   math.pow = function(a, b) {
     try {
@@ -23,7 +23,7 @@ self.addEventListener('message', function(e) {
 
     }
   }
-  self.postMessage({ 'msg': 'Graphing' });
+
   var svgWidth = 500;
   var svgHeight = 500;
   var stopDraw = false;
@@ -43,18 +43,18 @@ self.addEventListener('message', function(e) {
   // resolution = 50;
 
 
-  var xVal = parseInt(tinyX); //need object variable to keep up with xVal showing in graph
+  var xVal = parseFloat(tinyX); //need object variable to keep up with xVal showing in graph
 
   var yVal = evaluateEquation(equationToEval, xVal);
 
   var prevY = null;
-  widthx = 460 / Math.abs(parseInt(tinyX) - parseInt(largeX));
+  widthx = 460 / Math.abs(parseFloat(tinyX) - parseFloat(largeX));
   resolution = widthx;
-  yAxisPosition = 20 + (-1 * widthx * (parseInt(tinyX)));
-  widthy = 460 / Math.abs(parseInt(tinyY) - parseInt(largeY));
-  xAxisPosition = 20 + (widthy * (parseInt(largeY)));
+  yAxisPosition = 20 + (-1 * widthx * (parseFloat(tinyX)));
+  widthy = 460 / Math.abs(parseFloat(tinyY) - parseFloat(largeY));
+  xAxisPosition = 20 + (widthy * (parseFloat(largeY)));
 
-  // if (isFinite(yVal) && !isNaN(yVal) && yVal <= parseInt(largeY) && yVal >= parseInt(tinyY)) {
+  // if (isFinite(yVal) && !isNaN(yVal) && yVal <= parseFloat(largeY) && yVal >= parseFloat(tinyY)) {
   //   var path = "M20 " + (xAxisPosition - parseFloat(yVal * widthy)) + " ";
   // } else {
   //   var path = "";
@@ -68,28 +68,29 @@ self.addEventListener('message', function(e) {
       yVal = evaluateEquation(equationToEval, xVal + (j / resolution));
 
 
-      if (!isNaN(yVal) && yVal <= parseInt(largeY) && yVal >= parseInt(tinyY) && (isFinite(yVal))) {
-        if ((isNaN(prevY) || path == "" || !isFinite(prevY)) && prevY >= parseInt(tinyY) && prevY <= parseInt(largeY)) {
+      if (!isNaN(yVal) && yVal <= parseFloat(largeY) && yVal >= parseFloat(tinyY) && (isFinite(yVal))) {
+        if ((isNaN(prevY) || path == "" || !isFinite(prevY)) && prevY >= parseFloat(tinyY) && prevY <= parseFloat(largeY)) {
           path += "M" + (yAxisPosition + parseFloat((xVal + (j / resolution)) * (widthx))) + " " + (xAxisPosition - parseFloat(yVal * widthy)) + " ";
           path += "L" + (yAxisPosition + parseFloat((xVal + (j / resolution)) * (widthx))) + " " + (xAxisPosition - parseFloat(yVal * widthy)) + " ";
-        } else if (prevY < parseInt(tinyY)) { //from below window back onto window
+          console.log(widthy);
+        } else if (prevY < parseFloat(tinyY)) { //from below window back onto window
           if (isFinite(prevY)) {
             tempM = (yVal - prevY) * resolution;
             tempB = tempM * (xVal + (j / resolution)) + (yVal);
-            tempXValue = -1 * (parseInt(tinyY) - tempB) / tempM;
-            console.log(tempM + ' ' + ' ' + tempB + ' ' + tempXValue + '  ' + (xVal + (j / resolution)) + ' ' + yVal + ' ' + (xVal + ((j - 1) / resolution)) + ' ' + prevY);
-            path += "M" + (yAxisPosition + parseFloat(tempXValue * (widthx))) + " " + (xAxisPosition - parseFloat(parseInt(tinyY) * widthy)) + " ";
-            path += "L" + (yAxisPosition + parseFloat(tempXValue * (widthx))) + " " + (xAxisPosition - parseFloat(parseInt(tinyY) * widthy)) + " ";
+            tempXValue = -1 * (parseFloat(tinyY) - tempB) / tempM;
+            //console.log(tempM + ' ' + ' ' + tempB + ' ' + tempXValue + '  ' + (xVal + (j / resolution)) + ' ' + yVal + ' ' + (xVal + ((j - 1) / resolution)) + ' ' + prevY);
+            path += "M" + (yAxisPosition + parseFloat(tempXValue * (widthx))) + " " + (xAxisPosition - parseFloat(parseFloat(tinyY) * widthy)) + " ";
+            path += "L" + (yAxisPosition + parseFloat(tempXValue * (widthx))) + " " + (xAxisPosition - parseFloat(parseFloat(tinyY) * widthy)) + " ";
 
           }
-        } else if (prevY > parseInt(largeY)) { //from above window back onto window
+        } else if (prevY > parseFloat(largeY)) { //from above window back onto window
           if (isFinite(prevY)) {
             tempM = (yVal - prevY) * resolution;
             tempB = tempM * (xVal + ((j - 1) / resolution)) + (yVal);
-            tempXValue = -1 * (parseInt(largeY) - tempB) / tempM;
-            console.log(tempM + ' ' + ' ' + tempB + ' ' + tempXValue + '  ' + (xVal + (j / resolution)) + ' ' + yVal + ' ' + (xVal + ((j - 1) / resolution)) + ' ' + prevY);
-            path += "M" + (yAxisPosition + parseFloat(tempXValue * (widthx))) + " " + (xAxisPosition - parseFloat(parseInt(largeY) * widthy)) + " ";
-            path += "L" + (yAxisPosition + parseFloat(tempXValue * (widthx))) + " " + (xAxisPosition - parseFloat(parseInt(largeY) * widthy)) + " ";
+            tempXValue = -1 * (parseFloat(largeY) - tempB) / tempM;
+            //console.log(tempM + ' ' + ' ' + tempB + ' ' + tempXValue + '  ' + (xVal + (j / resolution)) + ' ' + yVal + ' ' + (xVal + ((j - 1) / resolution)) + ' ' + prevY);
+            path += "M" + (yAxisPosition + parseFloat(tempXValue * (widthx))) + " " + (xAxisPosition - parseFloat(parseFloat(largeY) * widthy)) + " ";
+            path += "L" + (yAxisPosition + parseFloat(tempXValue * (widthx))) + " " + (xAxisPosition - parseFloat(parseFloat(largeY) * widthy)) + " ";
 
           }
         } else if (isNaN(prevY) || path == "" || !isFinite(prevY)) { //basically catch if graph is undefined from minX to some other xValue
@@ -103,45 +104,45 @@ self.addEventListener('message', function(e) {
         //I don't think I need to handle this as it should be handled by the check for prevY isNaN in first if
         //might show warning however and is useful for summation and integration.
       } else if (!isFinite(yVal) && path != "") {
-        if (yVal > parseInt(largeY)) {
+        if (yVal > parseFloat(largeY)) {
           //positive inf
 
         } else {
           //neg inf
         }
-      } else if (yVal > parseInt(largeY) && prevY < parseInt(tinyY)) { //handle extremely fast changes that would not be graphed
-        //path += "M" + (yAxisPosition + parseFloat((xVal + ((j-1) / resolution)) * (widthx))) + " " + (xAxisPosition - parseFloat(parseInt(tinyY) * widthy)) + " ";
-        //path += "L" + (yAxisPosition + parseFloat((xVal + (j / resolution)) * (widthx))) + " " + (xAxisPosition - parseFloat(parseInt(largeY) * widthy)) + " ";
-        //path += "M" + (yAxisPosition + parseFloat((xVal + (j / resolution)) * (widthx))) + " " + (xAxisPosition - parseFloat(parseInt(largeY) * widthy)) + " ";
-      } else if (yVal < parseInt(tinyY) && prevY > parseInt(largeY)) { //handle extremely fast changes that would not be graphed
-        //path += "M" + (yAxisPosition + parseFloat((xVal + ((j-1) / resolution)) * (widthx))) + " " + (xAxisPosition - parseFloat(parseInt(largeY) * widthy)) + " ";
-        //path += "L" + (yAxisPosition + parseFloat((xVal + (j / resolution)) * (widthx))) + " " + (xAxisPosition - parseFloat(parseInt(tinyY) * widthy)) + " ";
-        //path += "M" + (yAxisPosition + parseFloat((xVal + (j / resolution)) * (widthx))) + " " + (xAxisPosition - parseFloat(parseInt(tinyY) * widthy)) + " ";
-      } else if (yVal > parseInt(largeY) && path != "") {
-        if (prevY < parseInt(largeY)) { //only draw if previous value was on graph and current value goes off graph
+      } else if (yVal > parseFloat(largeY) && prevY < parseFloat(tinyY)) { //handle extremely fast changes that would not be graphed
+        //path += "M" + (yAxisPosition + parseFloat((xVal + ((j-1) / resolution)) * (widthx))) + " " + (xAxisPosition - parseFloat(parseFloat(tinyY) * widthy)) + " ";
+        //path += "L" + (yAxisPosition + parseFloat((xVal + (j / resolution)) * (widthx))) + " " + (xAxisPosition - parseFloat(parseFloat(largeY) * widthy)) + " ";
+        //path += "M" + (yAxisPosition + parseFloat((xVal + (j / resolution)) * (widthx))) + " " + (xAxisPosition - parseFloat(parseFloat(largeY) * widthy)) + " ";
+      } else if (yVal < parseFloat(tinyY) && prevY > parseFloat(largeY)) { //handle extremely fast changes that would not be graphed
+        //path += "M" + (yAxisPosition + parseFloat((xVal + ((j-1) / resolution)) * (widthx))) + " " + (xAxisPosition - parseFloat(parseFloat(largeY) * widthy)) + " ";
+        //path += "L" + (yAxisPosition + parseFloat((xVal + (j / resolution)) * (widthx))) + " " + (xAxisPosition - parseFloat(parseFloat(tinyY) * widthy)) + " ";
+        //path += "M" + (yAxisPosition + parseFloat((xVal + (j / resolution)) * (widthx))) + " " + (xAxisPosition - parseFloat(parseFloat(tinyY) * widthy)) + " ";
+      } else if (yVal > parseFloat(largeY) && path != "") {
+        if (prevY < parseFloat(largeY)) { //only draw if previous value was on graph and current value goes off graph
 
           if (isFinite(prevY)) {
             tempM = (yVal - prevY) * resolution;
             tempB = tempM * (xVal + ((j - 1) / resolution)) + (yVal);
-            tempXValue = -1 * (parseInt(largeY) - tempB) / tempM;
-            console.log(tempM + ' ' + ' ' + tempB + ' ' + tempXValue + '  ' + (xVal + (j / resolution)) + ' ' + yVal + ' ' + (xVal + ((j - 1) / resolution)) + ' ' + prevY);
-            console.log("L" + (yAxisPosition + parseFloat(tempXValue * (widthx))) + " " + (xAxisPosition - parseFloat(parseInt(largeY) * widthy)) + " ");
-            path += "L" + (yAxisPosition + parseFloat(tempXValue * (widthx))) + " " + (xAxisPosition - parseFloat(parseInt(largeY) * widthy)) + " ";
+            tempXValue = -1 * (parseFloat(largeY) - tempB) / tempM;
+            //console.log(tempM + ' ' + ' ' + tempB + ' ' + tempXValue + '  ' + (xVal + (j / resolution)) + ' ' + yVal + ' ' + (xVal + ((j - 1) / resolution)) + ' ' + prevY);
+            //console.log("L" + (yAxisPosition + parseFloat(tempXValue * (widthx))) + " " + (xAxisPosition - parseFloat(parseFloat(largeY) * widthy)) + " ");
+            path += "L" + (yAxisPosition + parseFloat(tempXValue * (widthx))) + " " + (xAxisPosition - parseFloat(parseFloat(largeY) * widthy)) + " ";
           } else { //prevY is neg inf
 
           }
 
         }
-      } else if (yVal < parseInt(tinyY) && path != "") {
-        if (prevY > parseInt(tinyY)) { //only draw if previous value was on graph and current value goes off graph
+      } else if (yVal < parseFloat(tinyY) && path != "") {
+        if (prevY > parseFloat(tinyY)) { //only draw if previous value was on graph and current value goes off graph
 
           if (isFinite(prevY)) {
             tempM = (yVal - prevY) * resolution;
             tempB = tempM * (xVal + ((j - 1) / resolution)) + (yVal);
-            tempXValue = -1 * (parseInt(tinyY) - tempB) / tempM;
+            tempXValue = -1 * (parseFloat(tinyY) - tempB) / tempM;
             console.log(tempM + ' ' + ' ' + tempB + ' ' + tempXValue + '  ' + (xVal + (j / resolution)) + ' ' + yVal + ' ' + (xVal + ((j - 1) / resolution)) + ' ' + prevY);
 
-            path += "L" + (yAxisPosition + parseFloat(tempXValue * (widthx))) + " " + (xAxisPosition - parseFloat(parseInt(tinyY) * widthy)) + " ";
+            path += "L" + (yAxisPosition + parseFloat(tempXValue * (widthx))) + " " + (xAxisPosition - parseFloat(parseFloat(tinyY) * widthy)) + " ";
           } else { //prevY is pos inf
 
           }
@@ -165,21 +166,21 @@ self.addEventListener('message', function(e) {
   ////console.log(N + " " + a + " " + b);
   if (e.data.type == "rightsum") {
     xVal = b;
-    path = "M" + (20 + widthx * (b - parseInt(tinyX))) + " " + xAxisPosition;
+    path = "M" + (20 + widthx * (b - parseFloat(tinyX))) + " " + xAxisPosition;
     for (var K = 1; K <= N; K++) {
 
       yVal = evaluateEquation(equationToEval, xVal);
-      console.log(equationToEval);
-      console.log(xVal);
-      console.log(yVal);
-      if (isFinite(yVal) && !isNaN(yVal) && yVal <= parseInt(largeY) && yVal >= parseInt(tinyY)) {
+      //console.log(equationToEval);
+      //console.log(xVal);
+      //console.log(yVal);
+      if (isFinite(yVal) && !isNaN(yVal) && yVal <= parseFloat(largeY) && yVal >= parseFloat(tinyY)) {
         path = path + " v" + -1 * (parseFloat(yVal * widthy)) + " h" + (-1 * (((widthx * ((b - a) / N))))) + " v" + ((parseFloat(yVal * widthy)));
       } else {
         if (isNaN(yVal)) {
           path = "";
           break;
         }
-        if (yVal > parseInt(largeY)) {
+        if (yVal > parseFloat(largeY)) {
           path = path + " v" + -1 * (parseFloat(largeY * widthy)) + " m" + (-1 * (((widthx * ((b - a) / N))))) + " 0 v" + ((parseFloat(largeY * widthy)));
         } else {
           path = path + " v" + -1 * (parseFloat(tinyY * widthy)) + " m" + (-1 * (((widthx * ((b - a) / N))))) + " 0 v" + ((parseFloat(tinyY * widthy)));
@@ -192,18 +193,18 @@ self.addEventListener('message', function(e) {
   }
   if (e.data.type == "leftsum") {
     xVal = a;
-    path = "M" + (20 + widthx * (a - parseInt(tinyX))) + " " + xAxisPosition;
+    path = "M" + (20 + widthx * (a - parseFloat(tinyX))) + " " + xAxisPosition;
     for (var K = 1; K <= N; K++) {
 
       yVal = evaluateEquation(equationToEval, xVal);
-      if (isFinite(yVal) && !isNaN(yVal) && yVal <= parseInt(largeY) && yVal >= parseInt(tinyY)) {
+      if (isFinite(yVal) && !isNaN(yVal) && yVal <= parseFloat(largeY) && yVal >= parseFloat(tinyY)) {
         path = path + " v" + -1 * (parseFloat(yVal * widthy)) + " h" + (widthx * ((b - a) / N)) + " v" + ((parseFloat(yVal * widthy)));
       } else {
         if (isNaN(yVal)) {
           path = "";
           break;
         }
-        if (yVal > parseInt(largeY)) {
+        if (yVal > parseFloat(largeY)) {
           path = path + " v" + -1 * (parseFloat(largeY * widthy)) + " m" + (widthx * ((b - a) / N)) + " 0 v" + ((parseFloat(largeY * widthy)));
         } else {
           path = path + " v" + -1 * (parseFloat(tinyY * widthy)) + " m" + (widthx * ((b - a) / N)) + " 0 v" + ((parseFloat(tinyY * widthy)));
@@ -215,51 +216,102 @@ self.addEventListener('message', function(e) {
     }
     dataToPass.rect2 = path;
   }
-  if (e.data.type == "integral") {
-    xVal = a;
-    var highup = 0;
-    path = "M" + (20 + widthx * (a - parseInt(tinyX))) + " " + xAxisPosition;
-    for (var K = xVal; K <= b; K += (1 / resolution)) {
-      K = parseFloat(K.toFixed(6));
+  if (e.data.type == "integral" || e.data.shadeToX) {
+    if (Array.isArray(a) && Array.isArray(b) && a.length == b.length) {
+      dataToPass.shade = [];
+      for (var i = 0; i < a.length; i++) {
+        xVal = a[i];
+        var highup = 0;
+        path = "M" + (20 + widthx * (a[i] - parseFloat(tinyX))) + " " + xAxisPosition;
+        for (var K = xVal; K <= b[i]; K += (1 / resolution)) {
+          K = parseFloat(K.toFixed(6));
 
-      yVal = evaluateEquation(equationToEval, K);
-      if (!isNaN(yVal) && yVal <= parseInt(largeY) && yVal >= parseInt(tinyY)) {
+          yVal = evaluateEquation(equationToEval, K);
+          if (!isNaN(yVal) && yVal <= parseFloat(largeY) && yVal >= parseFloat(tinyY)) {
 
-        if (isFinite(yVal)) {
-          path += "L" + (yAxisPosition + parseFloat((K) * (widthx))) + " " + (xAxisPosition - parseFloat(yVal * widthy)) + " ";
+            if (isFinite(yVal)) {
+              path += "L" + (yAxisPosition + parseFloat((K) * (widthx))) + " " + (xAxisPosition - parseFloat(yVal * widthy)) + " ";
+            } else {
+              path += " V" + (xAxisPosition);
+              //console.log("asymptote in shaded region");
+            }
+          } else {
+            if (isNaN(yVal)) {
+              path = "";
+              //console.log(yVal + ' ' + K);
+              break;
+            }
+            if (yVal > parseFloat(largeY)) {
+              path += "L" + (yAxisPosition + parseFloat((K) * (widthx))) + " " + (xAxisPosition - parseFloat(largeY * widthy + 30)) + " ";
+            } else {
+              path += "L" + (yAxisPosition + parseFloat((K) * (widthx))) + " " + (xAxisPosition - parseFloat(tinyY * widthy - 30)) + " ";
+            }
+          }
+
+
+        }
+
+        if (path.length > 0) {
+          //if (isFinite(yVal)) {
+          // //console.log(parseFloat(yVal * widthy))
+          path += "L" + (yAxisPosition + parseFloat(b[i] * (widthx))) + " " + (xAxisPosition) + " ";
+          //}
+
+
+          path += "z";
+        }
+        dataToPass.shade.push(path);
+        console.log(dataToPass.shade);
+      }
+    } else {
+
+
+      xVal = a;
+      var highup = 0;
+      path = "M" + (20 + widthx * (a - parseFloat(tinyX))) + " " + xAxisPosition;
+      for (var K = xVal; K <= b; K += (1 / resolution)) {
+        K = parseFloat(K.toFixed(6));
+
+        yVal = evaluateEquation(equationToEval, K);
+        if (!isNaN(yVal) && yVal <= parseFloat(largeY) && yVal >= parseFloat(tinyY)) {
+
+          if (isFinite(yVal)) {
+            path += "L" + (yAxisPosition + parseFloat((K) * (widthx))) + " " + (xAxisPosition - parseFloat(yVal * widthy)) + " ";
+          } else {
+            path += " V" + (xAxisPosition);
+            //console.log("asymptote in shaded region");
+          }
         } else {
-          path += " V" + (xAxisPosition);
-          //console.log("asymptote in shaded region");
+          if (isNaN(yVal)) {
+            path = "";
+            //console.log(yVal + ' ' + K);
+            break;
+          }
+          if (yVal > parseFloat(largeY)) {
+            path += "L" + (yAxisPosition + parseFloat((K) * (widthx))) + " " + (xAxisPosition - parseFloat(largeY * widthy + 30)) + " ";
+          } else {
+            path += "L" + (yAxisPosition + parseFloat((K) * (widthx))) + " " + (xAxisPosition - parseFloat(tinyY * widthy - 30)) + " ";
+          }
         }
-      } else {
-        if (isNaN(yVal)) {
-          path = "";
-          //console.log(yVal + ' ' + K);
-          break;
-        }
-        if (yVal > parseInt(largeY)) {
-          path += "L" + (yAxisPosition + parseFloat((K) * (widthx))) + " " + (xAxisPosition - parseFloat(largeY * widthy + 30)) + " ";
-        } else {
-          path += "L" + (yAxisPosition + parseFloat((K) * (widthx))) + " " + (xAxisPosition - parseFloat(tinyY * widthy - 30)) + " ";
-        }
+
+
       }
 
+      if (path.length > 0) {
+        //if (isFinite(yVal)) {
+        // //console.log(parseFloat(yVal * widthy))
+        path += "L" + (yAxisPosition + parseFloat(b * (widthx))) + " " + (xAxisPosition) + " ";
+        //}
 
+
+        path += "z";
+      }
+      dataToPass.shade = path;
     }
-
-    if (path.length > 0) {
-      //if (isFinite(yVal)) {
-      // //console.log(parseFloat(yVal * widthy))
-      path += "L" + (yAxisPosition + parseFloat(b * (widthx))) + " " + (xAxisPosition) + " ";
-      //}
-
-
-      path += "z";
-    }
-    dataToPass.shade = path;
   }
   self.postMessage(dataToPass);
 });
+
 var evaluateEquation = function(equationToEval, x) {
 
   var a = math.eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")));
