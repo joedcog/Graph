@@ -95,6 +95,34 @@
         });
       </pre> 
     </div>
+    <div id='exponential'>
+      <h3>Exponential Distribution</h3>
+      <pre class="prettyprint lang-js" style="background: #eff">
+        var exponential = new Graph({
+          id: 'exponential',
+          type: 'exponential',
+          maxY: 1,
+          minY: 0,
+          maxX: 6,
+          minX: 0,
+          yScale: 0.5
+        });
+      </pre> 
+    </div>
+    <div id='arcsine'>
+      <h3>Arcsine Distribution</h3>
+      <pre class="prettyprint lang-js" style="background: #eff">
+        var arcsine = new Graph({
+          id: 'arcsine',
+          type: 'arcsine',
+          maxY: 2.5,
+          minY: 0,
+          maxX: 1,
+          minX: 0,
+          yScale: 0.5
+        });
+      </pre> 
+    </div>
     <div id='normal'>
       <h3>Normal</h3>
       <pre class="prettyprint lang-js" style="background: #eff">
@@ -232,6 +260,24 @@
     a: [0, 3, 7],
     b: [2, 5, 8],
     shadeToX: true
+  });
+  var exponential = new Graph({
+    id: 'exponential',
+    type: 'exponential',
+    maxY: 1,
+    minY: 0,
+    maxX: 6,
+    minX: 0,
+    yScale: 0.5
+  });
+  var arcsine = new Graph({
+    id: 'arcsine',
+    type: 'arcsine',
+    maxY: 2.5,
+    minY: 0,
+    maxX: 1,
+    minX: 0,
+    yScale: 0.5
   });
   var normal = new Graph({
     id: 'normal',

@@ -15,6 +15,16 @@ var Graph = function(aobj) {
       this.equationToEval = '(1 / sqrt(2 * o^2 * pi) * e^(-1 * ((x - u)^2) / (2 * o^2)))';
       this.equationToEval = this.equationToEval.replace(new RegExp("o", 'g'), "(" + this.stdev + ")");
       this.equationToEval = this.equationToEval.replace(new RegExp("u", 'g'), "(" + this.mean + ")");
+    } else if (this.type.toLowerCase() == "arcsine") {
+      this.equationToEval = '1/(pi*sqrt(x(1-x)))';
+    } else if (this.type.toLowerCase() == "exponential"){
+      if (aobj.lambda) {
+        this.lambda = parseFloat(aobj.lambda);
+      } else {
+        this.lambda = 1;
+      }
+      this.equationToEval = '(lambda * e ^ (-lambdax))';
+      this.equationToEval = this.equationToEval.replace(new RegExp("lambda", 'g'), "(" + this.lambda + ")");
     }
   } else {
     this.type = "null";
@@ -38,6 +48,16 @@ var Graph = function(aobj) {
       this.equationToEval = '(1 / sqrt(2 * o^2 * pi) * e^(-1 * ((x - u)^2) / (2 * o^2)))';
       this.equationToEval = this.equationToEval.replace(new RegExp("o", 'g'), "(" + this.stdev + ")");
       this.equationToEval = this.equationToEval.replace(new RegExp("u", 'g'), "(" + this.mean + ")");
+    } else if (this.type.toLowerCase() == "arcsine") {
+      this.equationToEval = '1/(pi*sqrt(x(1-x)))';
+    } else if (this.type.toLowerCase() == "exponential"){
+      if (aobj.lambda) {
+        this.lambda = parseFloat(aobj.lambda);
+      } else {
+        this.lambda = 1;
+      }
+      this.equationToEval = '(lambda * e ^ (-lambdax))';
+      this.equationToEval = this.equationToEval.replace(new RegExp("lambda", 'g'), "(" + this.lambda + ")");
     } else {
       this.equationToEval = '';
     }
