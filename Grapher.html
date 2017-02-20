@@ -11,6 +11,7 @@
   <!--     <script type="text/javascript" async src="../Shared Libraries/MathJax-master/MathJax-master/MathJax.js?config=TeX-MML-AM_CHTML"></script> -->
   <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.7.0/math.js"></script>
+  <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
 </head>
 
 <body>
@@ -18,35 +19,172 @@
   <section>
     <div id='left'>
       <h3>Left Sum</h3>
+      <pre class="prettyprint lang-js" style="background: #eff">
+        var left = new Graph({
+          id: 'left',
+          equationToEval: 'x',
+          a: 0,
+          b: 2,
+          N: 4,
+          yScale: 2,
+          xScale: 2,
+          minX: -20,
+          type: 'leftsum'
+        });
+      </pre>
     </div>
     <div id='right'>
       <h3>Right Sum</h3>
+      <pre class="prettyprint lang-js" style="background: #eff">
+        var right = new Graph({
+          id: 'right',
+          equationToEval: ['x^3 + 1'],
+          a: 0,
+          b: 2,
+          N: 4,
+          type: 'rightsum'
+        });
+      </pre>
     </div>
     <div id='integral'>
       <h3>Integral</h3>
+      <pre class="prettyprint lang-js" style="background: #eff">
+        var integral = new Graph({
+          id: 'integral',
+          equationToEval: 'x^2',
+          a: 0,
+          b: 2,
+          xScale: 0.5,
+          type: 'integral'
+        });
+      </pre>
     </div>
     <div id='integral2'>
       <h3>Integral [Multiple Regions]</h3>
+      <pre class="prettyprint lang-js" style="background: #eff">
+        var integral2 = new Graph({
+          id: 'integral2',
+          equationToEval: '3sinx + 1',
+          a: [0, -3, 7],
+          b: [2, -1, 8],
+          type: 'integral'
+        });
+      </pre> 
     </div>
     <div id='shadeToX'>
       <h3>Shade To X</h3>
+      <pre class="prettyprint lang-js" style="background: #eff">
+        var shadeToX = new Graph({
+          id: 'shadeToX',
+          equationToEval: ['x^3 + 1'],
+          a: 0,
+          b: 2,
+          shadeToX: true
+        });
+      </pre> 
     </div>
     <div id='shadeToX2'>
       <h3>Shade To X [Multiple Regions]</h3>
+      <pre class="prettyprint lang-js" style="background: #eff">
+        var shadeMulti = new Graph({
+          id: 'shadeToX2',
+          equationToEval: '3sinx + 1',
+          a: [0, 3, 7],
+          b: [2, 5, 8],
+          shadeToX: true
+        });
+      </pre> 
     </div>
     <div id='normal'>
       <h3>Normal</h3>
+      <pre class="prettyprint lang-js" style="background: #eff">
+        var normal = new Graph({
+          id: 'normal',
+          type: 'normal',
+          maxY: 0.4,
+          minY: 0,
+          maxX: 4,
+          minX: -4,
+          yScale: 0.1
+        });
+      </pre> 
     </div>
     <div id='normal2'>
       <h3>Normal Shade To X</h3>
+      <pre class="prettyprint lang-js" style="background: #eff">
+        var normal2 = new Graph({
+          id: 'normal2',
+          type: 'normal',
+          maxY: 0.4,
+          minY: 0,
+          maxX: 4,
+          minX: -4,
+          a: -2,
+          b: 1,
+          shadeToX: true,
+          yScale: 0.1
+        });
+      </pre> 
     </div>
     <div id='normal3'>
       <h3>Normal Shade To X [Multiple Regions]</h3>
+      <pre class="prettyprint lang-js" style="background: #eff">
+        var normal3 = new Graph({
+          id: 'normal3',
+          type: 'normal',
+          maxY: 0.4,
+          minY: 0,
+          maxX: 4,
+          minX: -4,
+          shadeToX: true,
+          a: [1, -2],
+          b: [2, -1],
+          yScale: 0.1
+        });
+      </pre> 
     </div>
-
+    <div id='points'>
+      <h3>Points</h3>
+      <pre class="prettyprint lang-js" style="background: #eff">
+        var points = new Graph({
+          id: 'points',
+          points: ['(3,1)', '(5,-2)']
+        });
+      </pre> 
+    </div>
+    <div id='pointsLabelled'>
+      <h3>Points Labelled</h3>
+      <pre class="prettyprint lang-js" style="background: #eff">
+        var pointsLabeled = new Graph({
+          id: 'pointsLabeled',
+          points: ['(3,1)', '(5,-2)'],
+          labelPoints: true
+        });
+      </pre> 
+    </div>
+    <div id='pointsOnGraph'>
+      <h3>Points On A Graph</h3>
+      <pre class="prettyprint lang-js" style="background: #eff">
+        var pointsOnGraph = new Graph({
+          id: 'pointsOnGraph',
+          equationToEval: 'x^2',
+          pointsOnGraph: [3, 2, -5]
+        });
+      </pre> 
+    </div>
+    <div id='pointsOnGraphLabelled'>
+      <h3>Points On A Graph Selectively Labelled</h3>
+      <pre class="prettyprint lang-js" style="background: #eff">
+        var pointsOnGraphLabeled = new Graph({
+          id: 'pointsOnGraphLabeled',
+          equationToEval: 'x^2',
+          pointsOnGraph: [3, 2, -5],
+          labelPoints: [true, false, true]
+        });
+      </pre> 
+    </div>
   </section>
   <script>
-
   var left = new Graph({
     id: 'left',
     equationToEval: 'x',
@@ -92,7 +230,7 @@
     id: 'shadeToX2',
     equationToEval: '3sinx + 1',
     a: [0, 3, 7],
-    b: [2, 5, 8], 
+    b: [2, 5, 8],
     shadeToX: true
   });
   var normal = new Graph({
@@ -127,6 +265,26 @@
     a: [1, -2],
     b: [2, -1],
     yScale: 0.1
+  });
+  var points = new Graph({
+    id: 'points',
+    points: ['(3,1)', '(5,-2)']
+  });
+  var pointsLabelled = new Graph({
+    id: 'pointsLabelled',
+    points: ['(3,1)', '(5,-2)'],
+    labelPoints: true
+  });
+  var pointsOnGraph = new Graph({
+    id: 'pointsOnGraph',
+    equationToEval: 'x^2',
+    pointsOnGraph: [3, 2, -5]
+  });
+  var pointsOnGraphLabelled = new Graph({
+    id: 'pointsOnGraphLabelled',
+    equationToEval: 'x^2',
+    pointsOnGraph: [3, 2, -5],
+    labelPoints: [true, false, true]
   });
   </script>
 </body>

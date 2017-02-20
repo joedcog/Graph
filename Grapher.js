@@ -1,10 +1,7 @@
 var Graph = function(aobj) {
-  if (aobj.equationToEval) {
-    this.equationToEval = aobj.equationToEval;
-  } else {
-    if (aobj.type.toLowerCase() == 'cartesian' || aobj.type.toLowerCase() == 'leftsum' || aobj.type.toLowerCase() == 'rightsum' || aobj.type.toLowerCase() == 'integral' || !aobj.type) {
-      throw ("You must submit an equation to evaluate.");
-    } else if (aobj.type == 'normal') {
+  if (aobj.type) {
+    this.type = aobj.type;
+    if (this.type.toLowerCase() == "normal") {
       if (aobj.stdev) {
         this.stdev = parseFloat(aobj.stdev);
       } else {
@@ -15,19 +12,55 @@ var Graph = function(aobj) {
       } else {
         this.mean = 0;
       }
-      this.equationToEval = '(1 / Math.sqrt(2 * Math.pow(o, 2) * Math.pi) * Math.pow(Math.E, (-1 * Math.pow((x - u), 2) / (2 * Math.pow(o, 2)))))';
+      this.equationToEval = '(1 / sqrt(2 * o^2 * pi) * e^(-1 * ((x - u)^2) / (2 * o^2)))';
+      this.equationToEval = this.equationToEval.replace(new RegExp("o", 'g'), "(" + this.stdev + ")");
+      this.equationToEval = this.equationToEval.replace(new RegExp("u", 'g'), "(" + this.mean + ")");
+    }
+  } else {
+    this.type = "null";
+  }
+  if (aobj.equationToEval) {
+    this.equationToEval = aobj.equationToEval;
+  } else {
+    if (this.type.toLowerCase() == 'cartesian' || this.type.toLowerCase() == 'leftsum' || this.type.toLowerCase() == 'rightsum' || this.type.toLowerCase() == 'integral' || !this.type) {
+      throw ("You must submit an equation to evaluate.");
+    } else if (this.type == 'normal') {
+      if (aobj.stdev) {
+        this.stdev = parseFloat(aobj.stdev);
+      } else {
+        this.stdev = 1;
+      }
+      if (aobj.mean) {
+        this.mean = parseFloat(aobj.mean);
+      } else {
+        this.mean = 0;
+      }
+      this.equationToEval = '(1 / sqrt(2 * o^2 * pi) * e^(-1 * ((x - u)^2) / (2 * o^2)))';
       this.equationToEval = this.equationToEval.replace(new RegExp("o", 'g'), "(" + this.stdev + ")");
       this.equationToEval = this.equationToEval.replace(new RegExp("u", 'g'), "(" + this.mean + ")");
     } else {
-      throw ("You must submit either an equation to evaluate or a type that has a predefined function (e.g. 'normal')");
+      this.equationToEval = '';
     }
   }
-  if(aobj.title){
+  if(aobj.showXAxisGrid || aobj.showYAxisGrid == false){
+    this.showXAxisGrid = aobj.showXAxisGrid;
+  } else {
+    this.showXAxisGrid = true;
+  }
+  if(aobj.showYAxisGrid || aobj.showYAxisGrid == false){
+    this.showYAxisGrid = aobj.showYAxisGrid;
+  } else {
+    this.showYAxisGrid = true;
+  }
+  if (aobj.labelPoints) {
+    this.labelPoints = aobj.labelPoints;
+  }
+  if (aobj.title) {
     this.title = aobj.title;
   } else {
     this.title = "Cartesian Graph";
   }
-  if(aobj.desc){
+  if (aobj.desc) {
     this.desc = aobj.desc;
   } else {
     this.desc = "The graph of a function";
@@ -42,6 +75,11 @@ var Graph = function(aobj) {
   }
   if (aobj.pointsOnGraph) {
     this.pointsOnGraph = aobj.pointsOnGraph;
+  }
+  if (aobj.pointRadius) {
+    this.pointRadius = aobj.pointRadius;
+  } else {
+    this.pointRadius = "3";
   }
   if (aobj.minX || aobj.minY == 0) {
     this.minX = aobj.minX;
@@ -94,28 +132,6 @@ var Graph = function(aobj) {
     this.N = parseFloat(aobj.N);
   } else {
     this.N = 4;
-  }
-  if (aobj.type) {
-    this.type = aobj.type;
-    if (this.type.toLowerCase() == "normal") {
-      if (aobj.stdev) {
-        this.stdev = parseFloat(aobj.stdev);
-      } else {
-        this.stdev = 1;
-      }
-      if (aobj.mean) {
-        this.mean = parseFloat(aobj.mean);
-      } else {
-        this.mean = 0;
-      }
-      this.equationToEval = '(1 / sqrt(2 * o^2 * pi) * e^(-1 * ((x - u)^2) / (2 * o^2)))';
-      this.equationToEval = this.equationToEval.replace(new RegExp("o", 'g'), "(" + this.stdev + ")");
-      this.equationToEval = this.equationToEval.replace(new RegExp("u", 'g'), "(" + this.mean + ")");
-    }
-  } else if (aobj.equationToEval) {
-    this.type = "cartesian";
-  } else {
-    throw ("You must have either an equationToEval or a type that does not require a function such as 'normal'.");
   }
   if (aobj.svgWidth || aobj.svgWidth == 0) {
     this.svgWidth = aobj.svgWidth;
@@ -204,6 +220,7 @@ var Graph = function(aobj) {
     if (this.drawAxis) {
       this.drawGraphAxis();
     }
+
     if (Array.isArray(this.equationToEval)) {
       for (var i = 0; i < this.equationToEval.length; i++) {
         this.drawGraph(this.equationToEval[i]);
@@ -213,6 +230,7 @@ var Graph = function(aobj) {
       this.drawGraph(this.equationToEval);
       this.summations(this.equationToEval);
     }
+
 
 
     //this.drawGraphAxis();
@@ -291,94 +309,98 @@ var Graph = function(aobj) {
 
     x = this.minX;
     var i = this.sidePadding;
-    for (j = this.minX; j <= this.maxX; j += this.xScale) {
+    if (this.showYAxisGrid) {
+      for (j = this.minX; j <= this.maxX; j += this.xScale) {
 
 
-      vertical = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        vertical = document.createElementNS('http://www.w3.org/2000/svg', 'path');
 
-      vertical.setAttribute('d', 'M' + i + ' 20 v' + (this.svgHeight - 2 * this.TopBottomPadding));
-      if (x.toFixed(6) != 0) {
-        vertical.setAttribute('stroke-width', '.5');
-      } else {
-        vertical.setAttribute('stroke-width', '1');
-        vertical.setAttribute('id', 'yAxisLine');
-        vertical.setAttribute('stroke', 'black');
-      }
-
-      axisLines.appendChild(vertical);
-
-      //set values
-      if (x == this.minX || x == this.maxX || x.toFixed(6) == 0) {
-        axisVal = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        x = parseFloat(x.toFixed(6));
-        textNode = document.createTextNode(x);
-
-        axisVal.setAttribute('x', i);
-        axisVal.setAttribute('id', "x" + x)
-
-        if ((Math.abs(x)) % 2 == 0) {
-          axisVal.setAttribute('y', 7);
+        vertical.setAttribute('d', 'M' + i + ' 20 v' + (this.svgHeight - 2 * this.TopBottomPadding));
+        if (x.toFixed(6) != 0) {
+          vertical.setAttribute('stroke-width', '.5');
         } else {
-          axisVal.setAttribute('y', 17);
+          vertical.setAttribute('stroke-width', '1');
+          vertical.setAttribute('id', 'yAxisLine');
+          vertical.setAttribute('stroke', 'black');
         }
-        axisVal.setAttribute('font-size', '7pt');
-        axisVal.setAttribute('font-weight', 'lighter');
-        axisVal.setAttribute('text-anchor', 'middle');
-        axisVal.setAttribute('vector-effect', 'non-scaling-stroke');
+
+        axisLines.appendChild(vertical);
+
+        //set values
+        if (x == this.minX || x == this.maxX || x.toFixed(6) == 0) {
+          axisVal = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          x = parseFloat(x.toFixed(6));
+          textNode = document.createTextNode(x);
+
+          axisVal.setAttribute('x', i);
+          axisVal.setAttribute('id', "x" + x)
+
+          if ((Math.abs(x)) % 2 == 0) {
+            axisVal.setAttribute('y', 7);
+          } else {
+            axisVal.setAttribute('y', 17);
+          }
+          axisVal.setAttribute('font-size', '7pt');
+          axisVal.setAttribute('font-weight', 'lighter');
+          axisVal.setAttribute('text-anchor', 'middle');
+          axisVal.setAttribute('vector-effect', 'non-scaling-stroke');
 
 
-        axisVal.appendChild(textNode);
-        axisLines.appendChild(axisVal);
+          axisVal.appendChild(textNode);
+          axisLines.appendChild(axisVal);
 
 
+        }
+        x += this.xScale;
+        i += this.widthx;
       }
-      x += this.xScale;
-      i += this.widthx;
     }
 
     this.widthy = (this.svgWidth - 2 * this.sidePadding) / (Math.abs(this.minY - this.maxY) / this.yScale);
     x = this.maxY;
     i = this.sidePadding;
+
     var horizontal;
+    if (this.showXAxisGrid) {
+      for (j = this.maxY; j >= this.minY; j -= this.yScale) {
 
-    for (j = this.maxY; j >= this.minY; j -= this.yScale) {
+
+        horizontal = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+
+        horizontal.setAttribute('d', 'M20 ' + i + ' h' + (this.svgHeight - 2 * this.sidePadding));
+
+        if (x.toFixed(6) != 0) {
+          horizontal.setAttribute('stroke-width', '.5');
+        } else {
+          horizontal.setAttribute('stroke-width', '1');
+          horizontal.setAttribute('id', 'xAxisLine');
+          horizontal.setAttribute('stroke', 'black');
+        }
+
+        axisLines.appendChild(horizontal);
+
+        //set values
+        if (x == this.minY || x == this.maxY || x.toFixed(6) == 0) {
+          x = parseFloat(x.toFixed(6));
+          axisVal = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          textNode = document.createTextNode(x);
+
+          axisVal.setAttribute('y', i + 3.5);
+          axisVal.setAttribute('x', 17);
+          axisVal.setAttribute('id', "y" + x)
+          axisVal.setAttribute('font-size', '7pt');
+          axisVal.setAttribute('font-weight', 'lighter');
+          axisVal.setAttribute('text-anchor', 'end');
+          axisVal.setAttribute('vector-effect', 'non-scaling-stroke');
+
+          axisVal.appendChild(textNode);
+          axisLines.appendChild(axisVal);
 
 
-      horizontal = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-
-      horizontal.setAttribute('d', 'M20 ' + i + ' h' + (this.svgHeight - 2 * this.sidePadding));
-
-      if (x.toFixed(6) != 0) {
-        horizontal.setAttribute('stroke-width', '.5');
-      } else {
-        horizontal.setAttribute('stroke-width', '1');
-        horizontal.setAttribute('id', 'xAxisLine');
-        horizontal.setAttribute('stroke', 'black');
+        }
+        x -= this.yScale;
+        i += this.widthy;
       }
-
-      axisLines.appendChild(horizontal);
-
-      //set values
-      if (x == this.minY || x == this.maxY || x.toFixed(6) == 0) {
-        x = parseFloat(x.toFixed(6));
-        axisVal = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        textNode = document.createTextNode(x);
-
-        axisVal.setAttribute('y', i + 3.5);
-        axisVal.setAttribute('x', 17);
-        axisVal.setAttribute('id', "y" + x)
-        axisVal.setAttribute('font-size', '7pt');
-        axisVal.setAttribute('font-weight', 'lighter');
-        axisVal.setAttribute('text-anchor', 'end');
-        axisVal.setAttribute('vector-effect', 'non-scaling-stroke');
-
-        axisVal.appendChild(textNode);
-        axisLines.appendChild(axisVal);
-
-
-      }
-      x -= this.yScale;
-      i += this.widthy;
     }
 
   };
@@ -396,15 +418,16 @@ var Graph = function(aobj) {
         $('#popup #stage').empty().append(e.data.msg);
       } else {
 
+        if (e.data.Main) {
+          var image = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          image.setAttribute('d', e.data.Main);
+          image.setAttribute('stroke-width', '2');
+          image.setAttribute('stroke', 'red');
+          image.setAttribute('fill-opacity', 0);
+          image.setAttribute('vector-effect', 'non-scaling-stroke');
 
-        var image = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        image.setAttribute('d', e.data.Main);
-        image.setAttribute('stroke-width', '2');
-        image.setAttribute('stroke', 'red');
-        image.setAttribute('fill-opacity', 0);
-        image.setAttribute('vector-effect', 'non-scaling-stroke');
-
-        graphContent.appendChild(image);
+          graphContent.appendChild(image);
+        }
         if (e.data.rect1) {
           image2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
           image2.setAttribute('d', e.data.rect1);
@@ -447,11 +470,55 @@ var Graph = function(aobj) {
             graphContent.appendChild(image4);
           }
         }
+        if (e.data.pcx) {
+          pointsContainer = image5 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          pointsContainer.setAttribute('id', 'pointsContainer' + gr.id)
+          for (var i = 0; i < e.data.pcx.length; i++) {
+            if (e.data.pcx[i] && e.data.pcy[i] && e.data.plabels[i]) {
+              image5 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+              image5.setAttribute('cx', e.data.pcx[i]);
+              image5.setAttribute('cy', e.data.pcy[i]);
+              image5.setAttribute('r', gr.pointRadius);
+              image5.setAttribute('stroke-width', '2');
+              image5.setAttribute('stroke', 'red');
+              image5.setAttribute('fill', 'red');
+              titleImage5 = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+              var textNode = document.createTextNode(e.data.plabels[i]);
+              titleImage5.appendChild(textNode);
+              image5.appendChild(titleImage5);
+              pointsContainer.appendChild(image5);
+
+              if (gr.labelPoints) {
+                if (Array.isArray(gr.labelPoints)) {
+                  if (gr.labelPoints[i]) {
+                    var textNode2 = document.createTextNode(e.data.plabels[i]);
+                    image6 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    image6.setAttribute('x', parseFloat(e.data.pcx[i]) + parseFloat(gr.pointRadius) + 5);
+                    image6.setAttribute('y', parseFloat(e.data.pcy[i]) + parseFloat(gr.pointRadius));
+                    image6.appendChild(textNode2);
+                    pointsContainer.appendChild(image6);
+                  }
+                } else {
+                  if (gr.labelPoints) {
+                    var textNode2 = document.createTextNode(e.data.plabels[i]);
+                    image6 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    image6.setAttribute('x', parseFloat(e.data.pcx[i]) + parseFloat(gr.pointRadius) + 5);
+                    image6.setAttribute('y', parseFloat(e.data.pcy[i]) + parseFloat(gr.pointRadius));
+                    image6.appendChild(textNode2);
+                    pointsContainer.appendChild(image6);
+                  }
+                }
+              }
+            }
+
+          }
+          graphContent.parentNode.appendChild(pointsContainer);
+        }
         worker.terminate();
-        
+
       }
     });
-    worker.postMessage({ 'widthx': gr.widthx, 'widthy': gr.widthy, 'xScale': gr.xScale, 'yScale': gr.yScale, 'svgWidth': gr.svgWidth, 'svgHeight': gr.svgHeight, 'sidePadding': gr.sidePadding, 'TopBottomPadding': gr.TopBottomPadding, 'type': gr.type, 'equationToEval': equationToEval, 'tinyX': gr.minX, 'largeX': gr.maxX, 'tinyY': gr.minY, 'largeY': gr.maxY, 'N': gr.N, 'a': gr.a, 'b': gr.b, 'shadeToX': gr.shadeToX });
+    worker.postMessage({ 'points': gr.points, 'pointsOnGraph': gr.pointsOnGraph, 'widthx': gr.widthx, 'widthy': gr.widthy, 'xScale': gr.xScale, 'yScale': gr.yScale, 'svgWidth': gr.svgWidth, 'svgHeight': gr.svgHeight, 'sidePadding': gr.sidePadding, 'TopBottomPadding': gr.TopBottomPadding, 'type': gr.type, 'equationToEval': equationToEval, 'tinyX': gr.minX, 'largeX': gr.maxX, 'tinyY': gr.minY, 'largeY': gr.maxY, 'N': gr.N, 'a': gr.a, 'b': gr.b, 'shadeToX': gr.shadeToX });
 
 
   };
@@ -518,13 +585,13 @@ var Graph = function(aobj) {
                 }
               }
             }
-            
+
             finalValue = gr.evaluateEquation(toDisplaySum.replace("=", ""));
 
             MathJax.Hub.Queue(function() {
-              
-            $('#' + gr.id + 'Sum').empty().append(toDisplayInt + toDisplaySum + finalValue + "`");
-              
+
+              $('#' + gr.id + 'Sum').empty().append(toDisplayInt + toDisplaySum + finalValue + "`");
+
             });
             MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
           } else {
