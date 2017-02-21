@@ -211,6 +211,30 @@
         });
       </pre> 
     </div>
+    <div id='canvas'>
+      <h3>Canvas</h3>
+      <pre class="prettyprint lang-js" style="background: #eff">
+        
+      </pre> 
+    </div>
+    <div id='canvasLeft'>
+      <h3>Canvas Left</h3>
+      <pre class="prettyprint lang-js" style="background: #eff">
+        
+      </pre> 
+    </div>
+    <div id='canvasRight'>
+      <h3>Canvas Right</h3>
+      <pre class="prettyprint lang-js" style="background: #eff">
+        
+      </pre> 
+    </div>
+    <div id='canvasIntegral'>
+      <h3>Canvas Integral</h3>
+      <pre class="prettyprint lang-js" style="background: #eff">
+        
+      </pre> 
+    </div>
   </section>
   <script>
   var left = new Graph({
@@ -331,6 +355,46 @@
     equationToEval: 'x^2',
     pointsOnGraph: [3, 2, -5],
     labelPoints: [true, false, true]
+  });
+  var canvas = new Graph({
+    id: 'canvas',
+    equationToEval: 'x',
+    render: 'canvas',
+    points: ['(3,1)', '(5,-2)'],
+    labelPoints: true
+  });
+  var canvasLeft = new Graph({
+    id: 'canvasLeft',
+    equationToEval: '-x - 9',
+    render: 'canvas',
+    a: 0,
+    b: 2,
+    N: 4,
+    yScale: 2,
+    xScale: 2,
+    minX: -20,
+    type: 'leftsum'
+  });
+  var canvasRight = new Graph({
+    id: 'canvasRight',
+    equationToEval: 'x + 9',
+    render: 'canvas',
+    type: 'right',
+    a: 0,
+    b: 2,
+    N: 4,
+    type: 'rightsum'
+  });
+  var canvasIntegral = new Graph({
+    id: 'canvasIntegral',
+    equationToEval: '1/x',
+    render: 'canvas',
+    a: -1,
+    b: 2,
+    xScale: 0.5,
+    type: 'integral',
+    pointsOnGraph: [3, 2, -5],
+    labelPoints: true
   });
   </script>
 </body>

@@ -1,4 +1,9 @@
 var Graph = function(aobj) {
+  if (aobj.render) {
+    this.render = aobj.render;
+  } else {
+    this.render = "svg";
+  }
   if (aobj.type) {
     this.type = aobj.type;
     if (this.type.toLowerCase() == "normal") {
@@ -17,7 +22,7 @@ var Graph = function(aobj) {
       this.equationToEval = this.equationToEval.replace(new RegExp("u", 'g'), "(" + this.mean + ")");
     } else if (this.type.toLowerCase() == "arcsine") {
       this.equationToEval = '1/(pi*sqrt(x(1-x)))';
-    } else if (this.type.toLowerCase() == "exponential"){
+    } else if (this.type.toLowerCase() == "exponential") {
       if (aobj.lambda) {
         this.lambda = parseFloat(aobj.lambda);
       } else {
@@ -50,7 +55,7 @@ var Graph = function(aobj) {
       this.equationToEval = this.equationToEval.replace(new RegExp("u", 'g'), "(" + this.mean + ")");
     } else if (this.type.toLowerCase() == "arcsine") {
       this.equationToEval = '1/(pi*sqrt(x(1-x)))';
-    } else if (this.type.toLowerCase() == "exponential"){
+    } else if (this.type.toLowerCase() == "exponential") {
       if (aobj.lambda) {
         this.lambda = parseFloat(aobj.lambda);
       } else {
@@ -62,12 +67,12 @@ var Graph = function(aobj) {
       this.equationToEval = '';
     }
   }
-  if(aobj.showXAxisGrid || aobj.showYAxisGrid == false){
+  if (aobj.showXAxisGrid || aobj.showYAxisGrid == false) {
     this.showXAxisGrid = aobj.showXAxisGrid;
   } else {
     this.showXAxisGrid = true;
   }
-  if(aobj.showYAxisGrid || aobj.showYAxisGrid == false){
+  if (aobj.showYAxisGrid || aobj.showYAxisGrid == false) {
     this.showYAxisGrid = aobj.showYAxisGrid;
   } else {
     this.showYAxisGrid = true;
@@ -99,7 +104,7 @@ var Graph = function(aobj) {
   if (aobj.pointRadius) {
     this.pointRadius = aobj.pointRadius;
   } else {
-    this.pointRadius = "3";
+    this.pointRadius = 3;
   }
   if (aobj.minX || aobj.minY == 0) {
     this.minX = aobj.minX;
@@ -200,60 +205,83 @@ var Graph = function(aobj) {
 
 
   this.init = function() {
-    var figure = document.createElement('figure');
-    figure.setAttribute('id', this.id + "figure");
-    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    if (this.render == "svg") {
+      var figure = document.createElement('figure');
+      figure.setAttribute('id', this.id + "figure");
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 
-    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    svg.setAttribute('viewBox', "0 0 500 500");
-    var axisSym = document.createElementNS('http://www.w3.org/2000/svg', 'symbol');
-    axisSym.setAttribute('id', this.id + "AxisSymbol");
+      svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      svg.setAttribute('viewBox', "0 0 500 500");
+      var axisSym = document.createElementNS('http://www.w3.org/2000/svg', 'symbol');
+      axisSym.setAttribute('id', this.id + "AxisSymbol");
 
-    var axisG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    axisG.setAttribute('id', "axis" + this.id);
-    axisG.setAttribute('stroke', "#999999");
-    var graphG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-    use.setAttribute('id', 'use' + this.id);
-    use.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', '#' + this.id + 'GraphContents');
-    var graphsym = document.createElementNS('http://www.w3.org/2000/svg', 'symbol');
-    graphsym.setAttribute('id', this.id + 'GraphContents');
-    graphsym.setAttribute('viewBox', "0 0 500 500");
-    graphsym.setAttribute('width', '100%');
-    graphsym.setAttribute('height', '100%');
+      var axisG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      axisG.setAttribute('id', "axis" + this.id);
+      axisG.setAttribute('stroke', "#999999");
+      var graphG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+      use.setAttribute('id', 'use' + this.id);
+      use.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', '#' + this.id + 'GraphContents');
+      var graphsym = document.createElementNS('http://www.w3.org/2000/svg', 'symbol');
+      graphsym.setAttribute('id', this.id + 'GraphContents');
+      graphsym.setAttribute('viewBox', "0 0 500 500");
+      graphsym.setAttribute('width', '100%');
+      graphsym.setAttribute('height', '100%');
 
 
 
-    graphG.appendChild(use);
-    svg.appendChild(axisSym);
-    svg.appendChild(axisG);
-    svg.appendChild(graphG);
-    svg.appendChild(graphsym);
-    figure.appendChild(svg);
-    if (this.type == 'integral' || this.type == 'leftsum' || this.type == 'rightsum') {
-      var figcap = document.createElement('figcaption');
-      figcap.setAttribute('id', this.id + 'Sum');
-      figure.appendChild(figcap);
-    }
-    document.getElementById(this.id).appendChild(figure);
-
-    if (this.drawAxis) {
-      this.drawGraphAxis();
-    }
-
-    if (Array.isArray(this.equationToEval)) {
-      for (var i = 0; i < this.equationToEval.length; i++) {
-        this.drawGraph(this.equationToEval[i]);
-        this.summations(this.equationToEval[i]);
+      graphG.appendChild(use);
+      svg.appendChild(axisSym);
+      svg.appendChild(axisG);
+      svg.appendChild(graphG);
+      svg.appendChild(graphsym);
+      figure.appendChild(svg);
+      if (this.type == 'integral' || this.type == 'leftsum' || this.type == 'rightsum') {
+        var figcap = document.createElement('figcaption');
+        figcap.setAttribute('id', this.id + 'Sum');
+        figure.appendChild(figcap);
       }
-    } else {
-      this.drawGraph(this.equationToEval);
-      this.summations(this.equationToEval);
+
+      document.getElementById(this.id).appendChild(figure);
+      if (this.drawAxis) {
+        this.drawGraphAxis();
+      }
+
+      if (Array.isArray(this.equationToEval)) {
+        for (var i = 0; i < this.equationToEval.length; i++) {
+          this.drawGraph(this.equationToEval[i]);
+          this.summations(this.equationToEval[i]);
+        }
+      } else {
+        this.drawGraph(this.equationToEval);
+        this.summations(this.equationToEval);
+      }
+    } else if (this.render == "canvas") {
+      var figure = document.createElement('figure');
+      figure.setAttribute('id', this.id + "figure");
+      var canvas = document.createElement('canvas');
+      canvas.setAttribute('id', this.id + "canvas");
+      canvas.setAttribute('width', 500);
+      canvas.setAttribute('height', 500);
+      figure.appendChild(canvas);
+      this.ctx = canvas.getContext("2d");
+      document.getElementById(this.id).appendChild(figure);
+      if (this.drawAxis) {
+        this.canvasDrawGraphAxis();
+      }
+      if (Array.isArray(this.equationToEval)) {
+        for (var i = 0; i < this.equationToEval.length; i++) {
+          this.drawGraph(this.equationToEval[i]);
+          this.summations(this.equationToEval[i]);
+        }
+      } else {
+        this.drawGraph(this.equationToEval);
+        this.summations(this.equationToEval);
+      }
     }
 
 
 
-    //this.drawGraphAxis();
 
 
     // $(document).keydown(function(e) {
@@ -424,54 +452,146 @@ var Graph = function(aobj) {
     }
 
   };
+  this.canvasDrawGraphAxis = function() {
 
+    this.widthx = (this.svgWidth - 2 * this.sidePadding) / (Math.abs(this.minX - this.maxX) / this.xScale);
+    var vertical;
+    var ctx = this.ctx;
+
+    var axisVal;
+    var textNode;
+
+    x = this.minX;
+    var i = this.sidePadding;
+    if (this.showYAxisGrid) {
+      for (j = this.minX; j <= this.maxX; j += this.xScale) {
+        vertical = "";
+        ctx.beginPath();
+        ctx.moveTo(i, 20);
+        ctx.lineTo(i, (this.svgHeight - this.TopBottomPadding));
+        //vertical.setAttribute('d', 'M' + i + ' 20 v' + (this.svgHeight - 2 * this.TopBottomPadding));
+        if (x.toFixed(6) != 0) {
+          ctx.strokeStyle = "rgba(153, 153, 153, 0.5)";
+
+        } else {
+          ctx.strokeStyle = "black";
+        }
+
+
+
+
+        //set values
+        if (x == this.minX || x == this.maxX || x.toFixed(6) == 0) {
+          x = parseFloat(x.toFixed(6));
+          if ((Math.abs(x)) % 2 == 0) {
+            y = 7;
+          } else {
+            y = 17;
+          }
+          ctx.font = '7pt Arial';
+          ctx.textAlign = 'center';
+          ctx.fillText(x, i, y);
+        }
+        x += this.xScale;
+        i += this.widthx;
+        ctx.stroke();
+      }
+    }
+
+    this.widthy = (this.svgWidth - 2 * this.sidePadding) / (Math.abs(this.minY - this.maxY) / this.yScale);
+    x = this.maxY;
+    i = this.sidePadding;
+
+    var horizontal;
+    if (this.showXAxisGrid) {
+      for (j = this.maxY; j >= this.minY; j -= this.yScale) {
+        horizontal = "";
+        ctx.beginPath();
+        ctx.moveTo(20, i);
+        ctx.lineTo((this.svgHeight - this.sidePadding), i);
+
+        //horizontal.setAttribute('d', 'M20 ' + i + ' h' + (this.svgHeight - 2 * this.sidePadding));
+
+        if (x.toFixed(6) != 0) {
+          ctx.strokeStyle = "rgba(153, 153, 153, 0.5)";
+        } else {
+          ctx.strokeStyle = "black";
+        }
+
+
+        //set values
+        if (x == this.minY || x == this.maxY || x.toFixed(6) == 0) {
+          x = parseFloat(x.toFixed(6));
+          ctx.font = '7pt Arial';
+          ctx.textAlign = 'end';
+          ctx.fillText(x, 17, i + 3.5);
+        }
+        x -= this.yScale;
+        i += this.widthy;
+        ctx.stroke();
+      }
+    }
+
+  };
 
 
   this.drawGraph = function(equationToEval) {
     var graphContent = document.getElementById(this.id + 'GraphContents');
     var gr = this;
-    var worker = new Worker('GraphWorker.js');
-    worker.addEventListener('message', function(e) {
-      if (e.data.error) {
-        $('#popup #message').empty().append(e.data.error);
-      } else if (e.data.msg) {
-        $('#popup #stage').empty().append(e.data.msg);
-      } else {
+    var ctx = gr.ctx;
+    if (gr.render == "svg") {
+      var worker = new Worker('GraphWorker.js');
+      worker.addEventListener('message', function(e) {
+        if (e.data.error) {
+          $('#popup #message').empty().append(e.data.error);
+        } else if (e.data.msg) {
+          $('#popup #stage').empty().append(e.data.msg);
+        } else {
 
-        if (e.data.Main) {
-          var image = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-          image.setAttribute('d', e.data.Main);
-          image.setAttribute('stroke-width', '2');
-          image.setAttribute('stroke', 'red');
-          image.setAttribute('fill-opacity', 0);
-          image.setAttribute('vector-effect', 'non-scaling-stroke');
+          if (e.data.Main) {
+            var image = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            image.setAttribute('d', e.data.Main);
+            image.setAttribute('stroke-width', '2');
+            image.setAttribute('stroke', 'red');
+            image.setAttribute('fill-opacity', 0);
+            image.setAttribute('vector-effect', 'non-scaling-stroke');
 
-          graphContent.appendChild(image);
-        }
-        if (e.data.rect1) {
-          image2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-          image2.setAttribute('d', e.data.rect1);
-          image2.setAttribute('stroke-width', '2');
-          image2.setAttribute('stroke', 'blue');
-          image2.setAttribute('fill-opacity', 0);
-          image2.setAttribute('vector-effect', 'non-scaling-stroke');
-          graphContent.appendChild(image2);
-        }
-        if (e.data.rect2) {
-          image3 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-          image3.setAttribute('d', e.data.rect2);
-          image3.setAttribute('stroke-width', '2');
-          image3.setAttribute('stroke', 'Green');
-          image3.setAttribute('fill-opacity', 0);
-          image3.setAttribute('vector-effect', 'non-scaling-stroke');
+            graphContent.appendChild(image);
+          }
+          if (e.data.rect1) {
+            image2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            image2.setAttribute('d', e.data.rect1);
+            image2.setAttribute('stroke-width', '2');
+            image2.setAttribute('stroke', 'blue');
+            image2.setAttribute('fill-opacity', 0);
+            image2.setAttribute('vector-effect', 'non-scaling-stroke');
+            graphContent.appendChild(image2);
+          }
+          if (e.data.rect2) {
+            image3 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            image3.setAttribute('d', e.data.rect2);
+            image3.setAttribute('stroke-width', '2');
+            image3.setAttribute('stroke', 'Green');
+            image3.setAttribute('fill-opacity', 0);
+            image3.setAttribute('vector-effect', 'non-scaling-stroke');
 
-          graphContent.appendChild(image3);
-        }
-        if (e.data.shade) {
-          if (Array.isArray(e.data.shade)) {
-            for (var i = 0; i < e.data.shade.length; i++) {
+            graphContent.appendChild(image3);
+          }
+          if (e.data.shade) {
+            if (Array.isArray(e.data.shade)) {
+              for (var i = 0; i < e.data.shade.length; i++) {
+                image4 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                image4.setAttribute('d', e.data.shade[i]);
+                image4.setAttribute('stroke-width', '2');
+                image4.setAttribute('stroke', 'black');
+                image4.setAttribute('fill-opacity', 0.5);
+                image4.setAttribute('fill', '#999');
+                image4.setAttribute('vector-effect', 'non-scaling-stroke');
+                graphContent.appendChild(image4);
+              }
+            } else {
               image4 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-              image4.setAttribute('d', e.data.shade[i]);
+              image4.setAttribute('d', e.data.shade);
               image4.setAttribute('stroke-width', '2');
               image4.setAttribute('stroke', 'black');
               image4.setAttribute('fill-opacity', 0.5);
@@ -479,67 +599,145 @@ var Graph = function(aobj) {
               image4.setAttribute('vector-effect', 'non-scaling-stroke');
               graphContent.appendChild(image4);
             }
-          } else {
-            image4 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            image4.setAttribute('d', e.data.shade);
-            image4.setAttribute('stroke-width', '2');
-            image4.setAttribute('stroke', 'black');
-            image4.setAttribute('fill-opacity', 0.5);
-            image4.setAttribute('fill', '#999');
-            image4.setAttribute('vector-effect', 'non-scaling-stroke');
-            graphContent.appendChild(image4);
           }
-        }
-        if (e.data.pcx) {
-          pointsContainer = image5 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-          pointsContainer.setAttribute('id', 'pointsContainer' + gr.id)
-          for (var i = 0; i < e.data.pcx.length; i++) {
-            if (e.data.pcx[i] && e.data.pcy[i] && e.data.plabels[i]) {
-              image5 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-              image5.setAttribute('cx', e.data.pcx[i]);
-              image5.setAttribute('cy', e.data.pcy[i]);
-              image5.setAttribute('r', gr.pointRadius);
-              image5.setAttribute('stroke-width', '2');
-              image5.setAttribute('stroke', 'red');
-              image5.setAttribute('fill', 'red');
-              titleImage5 = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-              var textNode = document.createTextNode(e.data.plabels[i]);
-              titleImage5.appendChild(textNode);
-              image5.appendChild(titleImage5);
-              pointsContainer.appendChild(image5);
+          if (e.data.pcx) {
+            pointsContainer = image5 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            pointsContainer.setAttribute('id', 'pointsContainer' + gr.id)
+            for (var i = 0; i < e.data.pcx.length; i++) {
+              if (e.data.pcx[i] && e.data.pcy[i] && e.data.plabels[i]) {
+                image5 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                image5.setAttribute('cx', e.data.pcx[i]);
+                image5.setAttribute('cy', e.data.pcy[i]);
+                image5.setAttribute('r', gr.pointRadius);
+                image5.setAttribute('stroke-width', '2');
+                image5.setAttribute('stroke', 'red');
+                image5.setAttribute('fill', 'red');
+                titleImage5 = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+                var textNode = document.createTextNode(e.data.plabels[i]);
+                titleImage5.appendChild(textNode);
+                image5.appendChild(titleImage5);
+                pointsContainer.appendChild(image5);
 
-              if (gr.labelPoints) {
-                if (Array.isArray(gr.labelPoints)) {
-                  if (gr.labelPoints[i]) {
-                    var textNode2 = document.createTextNode(e.data.plabels[i]);
-                    image6 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    image6.setAttribute('x', parseFloat(e.data.pcx[i]) + parseFloat(gr.pointRadius) + 5);
-                    image6.setAttribute('y', parseFloat(e.data.pcy[i]) + parseFloat(gr.pointRadius));
-                    image6.appendChild(textNode2);
-                    pointsContainer.appendChild(image6);
-                  }
-                } else {
-                  if (gr.labelPoints) {
-                    var textNode2 = document.createTextNode(e.data.plabels[i]);
-                    image6 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    image6.setAttribute('x', parseFloat(e.data.pcx[i]) + parseFloat(gr.pointRadius) + 5);
-                    image6.setAttribute('y', parseFloat(e.data.pcy[i]) + parseFloat(gr.pointRadius));
-                    image6.appendChild(textNode2);
-                    pointsContainer.appendChild(image6);
+                if (gr.labelPoints) {
+                  if (Array.isArray(gr.labelPoints)) {
+                    if (gr.labelPoints[i]) {
+                      var textNode2 = document.createTextNode(e.data.plabels[i]);
+                      image6 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                      image6.setAttribute('x', parseFloat(e.data.pcx[i]) + parseFloat(gr.pointRadius) + 5);
+                      image6.setAttribute('y', parseFloat(e.data.pcy[i]) + parseFloat(gr.pointRadius));
+                      image6.appendChild(textNode2);
+                      pointsContainer.appendChild(image6);
+                    }
+                  } else {
+                    if (gr.labelPoints) {
+                      var textNode2 = document.createTextNode(e.data.plabels[i]);
+                      image6 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                      image6.setAttribute('x', parseFloat(e.data.pcx[i]) + parseFloat(gr.pointRadius) + 5);
+                      image6.setAttribute('y', parseFloat(e.data.pcy[i]) + parseFloat(gr.pointRadius));
+                      image6.appendChild(textNode2);
+                      pointsContainer.appendChild(image6);
+                    }
                   }
                 }
               }
+
+            }
+            graphContent.parentNode.appendChild(pointsContainer);
+          }
+          worker.terminate();
+
+        }
+      });
+      worker.postMessage({ 'points': gr.points, 'pointsOnGraph': gr.pointsOnGraph, 'widthx': gr.widthx, 'widthy': gr.widthy, 'xScale': gr.xScale, 'yScale': gr.yScale, 'svgWidth': gr.svgWidth, 'svgHeight': gr.svgHeight, 'sidePadding': gr.sidePadding, 'TopBottomPadding': gr.TopBottomPadding, 'type': gr.type, 'equationToEval': equationToEval, 'tinyX': gr.minX, 'largeX': gr.maxX, 'tinyY': gr.minY, 'largeY': gr.maxY, 'N': gr.N, 'a': gr.a, 'b': gr.b, 'shadeToX': gr.shadeToX });
+    } else if (gr.render == "canvas") {
+      var worker = new Worker('CanvasGraphWorker.js');
+      worker.addEventListener('message', function(e) {
+        if (e.data.error) {
+          $('#popup #message').empty().append(e.data.error);
+        } else if (e.data.msg) {
+          $('#popup #stage').empty().append(e.data.msg);
+        } else {
+
+          if (e.data.Main) {
+            ctx.strokeStyle = "red";
+            eval(e.data.Main);
+          }
+          if (e.data.rect1) {
+            ctx.strokeStyle = "blue";
+            eval(e.data.rect1);
+          }
+          if (e.data.rect2) {
+            ctx.strokeStyle = "green";
+            eval(e.data.rect2);
+          }
+          if (e.data.shade) {
+            ctx.strokeStyle = "black";
+            ctx.fillStyle = "rgba(153, 153, 153, 0.5)";
+            if (Array.isArray(e.data.shade)) {
+              for (var i = 0; i < e.data.shade.length; i++) {
+                eval(e.data.shade[i]);
+              }
+            } else {
+              eval(e.data.shade);
+            }
+          }
+          if (e.data.pcx) {
+            for (var i = 0; i < e.data.pcx.length; i++) {
+
+              if (e.data.pcx[i] && e.data.pcy[i] && e.data.plabels[i]) {
+                //ctx.moveTo(e.data.pcx[i], e.data.pcy[i]);
+                ctx.beginPath();
+                ctx.strokeStyle = "red";
+                ctx.fillStyle = "red";
+                ctx.arc(e.data.pcx[i], e.data.pcy[i], gr.pointRadius, 0, 2 * Math.PI);
+                ctx.stroke();
+                ctx.fill();
+                if (gr.labelPoints) {
+                  if (Array.isArray(gr.labelPoints)) {
+                    if (gr.labelPoints[i]) {
+                      ctx.beginPath();
+                      ctx.font = '10pt Arial';
+                      ctx.strokeStyle = "black";
+                      ctx.fillStyle = "black";
+                      ctx.fillText(e.data.plabels[i], parseFloat(e.data.pcx[i]) - parseFloat(gr.pointRadius) - 5, parseFloat(e.data.pcy[i]) + parseFloat(gr.pointRadius));
+                      
+                      // var textNode2 = document.createTextNode(e.data.plabels[i]);
+                      // image6 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                      // image6.setAttribute('x', parseFloat(e.data.pcx[i]) + parseFloat(gr.pointRadius) + 5);
+                      // image6.setAttribute('y', parseFloat(e.data.pcy[i]) + parseFloat(gr.pointRadius));
+                      // image6.appendChild(textNode2);
+                      // pointsContainer.appendChild(image6);
+                    }
+                  } else {
+                    if (gr.labelPoints) {
+                      ctx.beginPath();
+                      ctx.font = '10pt Arial';
+                      ctx.strokeStyle = "black";
+                      ctx.fillStyle = "black";
+                      ctx.fillText(e.data.plabels[i], parseFloat(e.data.pcx[i]) - parseFloat(gr.pointRadius) - 5, parseFloat(e.data.pcy[i]) + parseFloat(gr.pointRadius));
+                      
+                      // var textNode2 = document.createTextNode(e.data.plabels[i]);
+                      // image6 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                      // image6.setAttribute('x', parseFloat(e.data.pcx[i]) + parseFloat(gr.pointRadius) + 5);
+                      // image6.setAttribute('y', parseFloat(e.data.pcy[i]) + parseFloat(gr.pointRadius));
+                      // image6.appendChild(textNode2);
+                      // pointsContainer.appendChild(image6);
+                    }
+                  }
+                }
+
+              }
+
             }
 
           }
-          graphContent.parentNode.appendChild(pointsContainer);
+          worker.terminate();
+
         }
-        worker.terminate();
+      });
+      worker.postMessage({ 'points': gr.points, 'pointsOnGraph': gr.pointsOnGraph, 'widthx': gr.widthx, 'widthy': gr.widthy, 'xScale': gr.xScale, 'yScale': gr.yScale, 'svgWidth': gr.svgWidth, 'svgHeight': gr.svgHeight, 'sidePadding': gr.sidePadding, 'TopBottomPadding': gr.TopBottomPadding, 'type': gr.type, 'equationToEval': equationToEval, 'tinyX': gr.minX, 'largeX': gr.maxX, 'tinyY': gr.minY, 'largeY': gr.maxY, 'N': gr.N, 'a': gr.a, 'b': gr.b, 'shadeToX': gr.shadeToX });
 
-      }
-    });
-    worker.postMessage({ 'points': gr.points, 'pointsOnGraph': gr.pointsOnGraph, 'widthx': gr.widthx, 'widthy': gr.widthy, 'xScale': gr.xScale, 'yScale': gr.yScale, 'svgWidth': gr.svgWidth, 'svgHeight': gr.svgHeight, 'sidePadding': gr.sidePadding, 'TopBottomPadding': gr.TopBottomPadding, 'type': gr.type, 'equationToEval': equationToEval, 'tinyX': gr.minX, 'largeX': gr.maxX, 'tinyY': gr.minY, 'largeY': gr.maxY, 'N': gr.N, 'a': gr.a, 'b': gr.b, 'shadeToX': gr.shadeToX });
-
+    }
 
   };
   this.summations = function(equationToEval) {
@@ -554,27 +752,27 @@ var Graph = function(aobj) {
       } else {
         if (e.data.Right) {
           gr.rightSumValue = e.data.Right;
-          MathJax.Hub.Queue(function() {
-            if (gr.rightSumValue != "diverges") {
-              var rightSum = "<math><mstyle displaystyle='true'><msub><mi>R</mi><mi>n</mi></msub><mo>=</mo><munderover><mo>&#x2211;</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mn>" + N + "</mi></munderover><mrow><mi>f</mi><mo></mo><mrow><mo>(</mo><msub><mi>x</mi><mi>i</mi></msub><mo>)</mo></mrow><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></mstyle><mo>=</mo>";
-              $('#' + gr.id + 'Sum').empty().append(rightSum + "<mn>" + gr.rightSumValue + "</mn></mrow></math>" + "<br><span>where </span><math><msub><mi>x</mi><mi>i</mi></msub><mo>=</mo><mn>" + a + "</mn><mo>+</mo><mi>i</mi><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></math>");
-            } else {
-              $('#' + gr.id + 'Sum').empty().append("Right Sum diverges");
-            }
-          });
-          MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+          // MathJax.Hub.Queue(function() {
+          //   if (gr.rightSumValue != "diverges") {
+          //     var rightSum = "<math><mstyle displaystyle='true'><msub><mi>R</mi><mi>n</mi></msub><mo>=</mo><munderover><mo>&#x2211;</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mn>" + N + "</mi></munderover><mrow><mi>f</mi><mo></mo><mrow><mo>(</mo><msub><mi>x</mi><mi>i</mi></msub><mo>)</mo></mrow><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></mstyle><mo>=</mo>";
+          //     $('#' + gr.id + 'Sum').empty().append(rightSum + "<mn>" + gr.rightSumValue + "</mn></mrow></math>" + "<br><span>where </span><math><msub><mi>x</mi><mi>i</mi></msub><mo>=</mo><mn>" + a + "</mn><mo>+</mo><mi>i</mi><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></math>");
+          //   } else {
+          //     $('#' + gr.id + 'Sum').empty().append("Right Sum diverges");
+          //   }
+          // });
+          // MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
         }
         if (e.data.Left) {
           gr.leftSumValue = e.data.Left;
-          MathJax.Hub.Queue(function() {
-            if (gr.leftSumValue != "diverges") {
-              var leftSum = "<math><mstyle displaystyle='true'><msub><mi>L</mi><mi>n</mi></msub><mo>=</mo><munderover><mo>&#x2211;</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mn>" + N + "</mn></munderover><mrow><mi>f</mi><mo></mo><mrow><mo>(</mo><msub><mi>x</mi><mrow><mi>i</mi><mo>&#x2212;</mo><mn>1</mn></mrow></msub><mo>)</mo></mrow><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></mstyle><mo>=</mo>";
-              $('#' + gr.id + 'Sum').empty().append(leftSum + "<mn>" + gr.leftSumValue + "</mn></mrow></math>" + "<br><span>where </span><math><msub><mi>x</mi><mi>i</mi></msub><mo>=</mo><mn>" + a + "</mn><mo>+</mo><mi>i</mi><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></math>");
-            } else {
-              $('#' + gr.id + 'Sum').empty().append("Left Sum diverges");
-            }
-          });
-          MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+          // MathJax.Hub.Queue(function() {
+          //   if (gr.leftSumValue != "diverges") {
+          //     var leftSum = "<math><mstyle displaystyle='true'><msub><mi>L</mi><mi>n</mi></msub><mo>=</mo><munderover><mo>&#x2211;</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mn>" + N + "</mn></munderover><mrow><mi>f</mi><mo></mo><mrow><mo>(</mo><msub><mi>x</mi><mrow><mi>i</mi><mo>&#x2212;</mo><mn>1</mn></mrow></msub><mo>)</mo></mrow><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></mstyle><mo>=</mo>";
+          //     $('#' + gr.id + 'Sum').empty().append(leftSum + "<mn>" + gr.leftSumValue + "</mn></mrow></math>" + "<br><span>where </span><math><msub><mi>x</mi><mi>i</mi></msub><mo>=</mo><mn>" + a + "</mn><mo>+</mo><mi>i</mi><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></math>");
+          //   } else {
+          //     $('#' + gr.id + 'Sum').empty().append("Left Sum diverges");
+          //   }
+          // });
+          // MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
         }
         if (e.data.Integral) {
           if (Array.isArray(e.data.Integral)) {
@@ -608,22 +806,22 @@ var Graph = function(aobj) {
 
             finalValue = gr.evaluateEquation(toDisplaySum.replace("=", ""));
 
-            MathJax.Hub.Queue(function() {
+            // MathJax.Hub.Queue(function() {
 
-              $('#' + gr.id + 'Sum').empty().append(toDisplayInt + toDisplaySum + finalValue + "`");
+            //   $('#' + gr.id + 'Sum').empty().append(toDisplayInt + toDisplaySum + finalValue + "`");
 
-            });
-            MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+            // });
+            // MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
           } else {
             gr.integralValue = e.data.Integral;
-            MathJax.Hub.Queue(function() {
-              if (gr.integralValue != "diverges" && !isNaN(gr.integralValue)) {
-                $('#' + gr.id + 'Sum').empty().append("`int_(" + a + ")^(" + b + ")" + equationToEval + " dx = " + gr.integralValue + "`");
-              } else {
-                $('#' + gr.id + 'Sum').empty().append("`int_(" + a + ")^(" + b + ")" + equationToEval + " dx `" + " " + gr.integralValue);
-              }
-            });
-            MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+            // MathJax.Hub.Queue(function() {
+            //   if (gr.integralValue != "diverges" && !isNaN(gr.integralValue)) {
+            //     $('#' + gr.id + 'Sum').empty().append("`int_(" + a + ")^(" + b + ")" + equationToEval + " dx = " + gr.integralValue + "`");
+            //   } else {
+            //     $('#' + gr.id + 'Sum').empty().append("`int_(" + a + ")^(" + b + ")" + equationToEval + " dx `" + " " + gr.integralValue);
+            //   }
+            // });
+            // MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
           }
         }
         sumWork.terminate();
@@ -634,8 +832,8 @@ var Graph = function(aobj) {
   };
 
   this.createEquation = function() {
-    MathJax.Hub.Queue(function() { document.getElementById('equationList').innerHTML = "`f(x)=" + this.equationToEval + "`" });
-    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+    // MathJax.Hub.Queue(function() { document.getElementById('equationList').innerHTML = "`f(x)=" + this.equationToEval + "`" });
+    // MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
 
   };
 
