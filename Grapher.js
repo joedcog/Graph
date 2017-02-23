@@ -1,3 +1,90 @@
+var gamma = function(z) {
+  gammaEquationToEval = "(x^(a-1))*(e^-x)";
+  equationToEval = gammaEquationToEval.replace("a", "(" + z + ")");
+  //console.log(equationToEval);
+  integralValue = 0;
+  b = 5;
+  var xVal = b;
+  var tempY = 0;
+  a = 0;
+  if (z > 1) {
+    do {
+      tempY = ((evaluateGammaEquation(equationToEval, xVal) + evaluateGammaEquation(equationToEval, xVal)));
+      xVal++;
+    } while (tempY > 0.00001)
+  } else {
+    integralValue = 0;
+    b = 20;
+    var xVal = b;
+    var tempY = 0;
+    a = 0;
+    do {
+      tempY = ((evaluateGammaEquation(equationToEval, xVal) + evaluateGammaEquation(equationToEval, xVal)));
+      //console.log(tempY);
+      xVal--;
+    } while (tempY < 0.00001 && xVal > 1)
+  }
+
+  b = xVal
+  var size = 120;
+  var tempY = 0;
+  var prevYVal = 0;
+  if (z < 1) {
+    size = size / (z);
+  }
+  for (var i = 0; i < size * (b - a); i++) {
+    if (xVal - (1 / size) < a) {
+      tempY = ((evaluateGammaEquation(equationToEval, xVal) + evaluateGammaEquation(equationToEval, a)) * .5 * (1 / size));
+    } else {
+      tempY = ((evaluateGammaEquation(equationToEval, xVal) + evaluateGammaEquation(equationToEval, xVal - (1 / size))) * .5 * (1 / size));
+    }
+    if (i > 0) {
+      if (!isFinite(tempY)) {
+        break;
+      } else if (isNaN(tempY)) {
+        integralValue = "diverges";
+        break;
+      } else {
+        integralValue += parseFloat(tempY.toFixed(20));
+      }
+    } else {
+      if (isFinite(tempY) && !isNaN(tempY)) {
+        integralValue += parseFloat(tempY.toFixed(20));
+
+      } else if (isNaN(tempY)) {
+        integralValue += parseFloat(evaluateGammaEquation(equationToEval, xVal - (1 / (size * 100))) * (1 / size));
+      }
+    }
+    xVal = xVal - (1 / size);
+    prevYVal = tempY;
+  }
+
+  tempY = 0;
+  var prevYVal = 0;
+  var temporary = 0;
+
+  if (integralValue != "diverges" && !isNaN(integralValue)) {
+    integralValue = parseFloat(integralValue.toFixed(3));
+    if (integralValue.toString().length >= 20) {
+      integralValue = integralValue.toExponential(3);
+    }
+  }
+  return integralValue.toFixed(20).replace(/\.?0+$/, "");
+}
+
+var evaluateGammaEquation = function(equationToEval, x) {
+  x = x.toFixed(6);
+  var a = math.eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")));
+  if (!isNaN(a)) {
+
+    return parseFloat(parseFloat(math.eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")))));
+  } else {
+    return NaN
+  }
+}
+var beta = function(z, zz) {
+  return (gamma(z) * gamma(zz)) / gamma(z + zz);
+}
 var Graph = function(aobj) {
   if (aobj.render) {
     this.render = aobj.render;
@@ -30,6 +117,30 @@ var Graph = function(aobj) {
       }
       this.equationToEval = '(lambda * e ^ (-lambdax))';
       this.equationToEval = this.equationToEval.replace(new RegExp("lambda", 'g'), "(" + this.lambda + ")");
+    } else if (this.type.toLowerCase() == "chi-square") {
+      if (aobj.degreesOfFreedom) {
+        this.degreesOfFreedom = parseFloat(aobj.degreesOfFreedom);
+      } else {
+        this.degreesOfFreedom = 1;
+      }
+      this.gammaVal = gamma(this.degreesOfFreedom / 2);
+      this.equationToEval = '((x^((k/2)-1))*(e^(-x/2)))/((2^(k/2))*' + this.gammaVal + ')';
+      this.equationToEval = this.equationToEval.replace(new RegExp("k", 'g'), "(" + this.degreesOfFreedom + ")");
+    } else if (this.type.toLowerCase() == "f") {
+      if (aobj.degreesOfFreedom) {
+        this.degreesOfFreedom = parseFloat(aobj.degreesOfFreedom);
+      } else {
+        this.degreesOfFreedom = 1;
+      }
+      if (aobj.degreesOfFreedom2) {
+        this.degreesOfFreedom2 = parseFloat(aobj.degreesOfFreedom2);
+      } else {
+        this.degreesOfFreedom2 = 1;
+      }
+      this.betaVal = beta(this.degreesOfFreedom / 2, this.degreesOfFreedom2 / 2);
+      this.equationToEval = '(sqrt((((ax)^(a))*(b^b))/((ax+b)^(a+b))))/(x*' + this.betaVal + ')';
+      this.equationToEval = this.equationToEval.replace(new RegExp("a", 'g'), "(" + this.degreesOfFreedom + ")");
+      this.equationToEval = this.equationToEval.replace(new RegExp("b", 'g'), "(" + this.degreesOfFreedom2 + ")");
     }
   } else {
     this.type = "null";
@@ -63,6 +174,30 @@ var Graph = function(aobj) {
       }
       this.equationToEval = '(lambda * e ^ (-lambdax))';
       this.equationToEval = this.equationToEval.replace(new RegExp("lambda", 'g'), "(" + this.lambda + ")");
+    } else if (this.type.toLowerCase() == "chi-square") {
+      if (aobj.degreesOfFreedom) {
+        this.degreesOfFreedom = parseFloat(aobj.degreesOfFreedom);
+      } else {
+        this.degreesOfFreedom = 1;
+      }
+      this.gammaVal = gamma(this.degreesOfFreedom / 2);
+      this.equationToEval = '((x^((k/2)-1))*(e^(-x/2)))/((2^(k/2))*' + this.gammaVal + ')';
+      this.equationToEval = this.equationToEval.replace(new RegExp("\k", 'g'), "(" + this.degreesOfFreedom + ")");
+    } else if (this.type.toLowerCase() == "f") {
+      if (aobj.degreesOfFreedom) {
+        this.degreesOfFreedom = parseFloat(aobj.degreesOfFreedom);
+      } else {
+        this.degreesOfFreedom = 1;
+      }
+      if (aobj.degreesOfFreedom2) {
+        this.degreesOfFreedom2 = parseFloat(aobj.degreesOfFreedom2);
+      } else {
+        this.degreesOfFreedom2 = 1;
+      }
+      this.betaVal = beta(this.degreesOfFreedom / 2, this.degreesOfFreedom2 / 2);
+      this.equationToEval = '(sqrt((((ax)^(a))*(b^b))/((ax+b)^(a+b))))/(x*' + this.betaVal + ')';
+      this.equationToEval = this.equationToEval.replace(new RegExp("a", 'g'), "(" + this.degreesOfFreedom + ")");
+      this.equationToEval = this.equationToEval.replace(new RegExp("b", 'g'), "(" + this.degreesOfFreedom2 + ")");
     } else {
       this.equationToEval = '';
     }
@@ -700,13 +835,6 @@ var Graph = function(aobj) {
                       ctx.strokeStyle = "black";
                       ctx.fillStyle = "black";
                       ctx.fillText(e.data.plabels[i], parseFloat(e.data.pcx[i]) - parseFloat(gr.pointRadius) - 5, parseFloat(e.data.pcy[i]) + parseFloat(gr.pointRadius));
-                      
-                      // var textNode2 = document.createTextNode(e.data.plabels[i]);
-                      // image6 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                      // image6.setAttribute('x', parseFloat(e.data.pcx[i]) + parseFloat(gr.pointRadius) + 5);
-                      // image6.setAttribute('y', parseFloat(e.data.pcy[i]) + parseFloat(gr.pointRadius));
-                      // image6.appendChild(textNode2);
-                      // pointsContainer.appendChild(image6);
                     }
                   } else {
                     if (gr.labelPoints) {
@@ -715,13 +843,6 @@ var Graph = function(aobj) {
                       ctx.strokeStyle = "black";
                       ctx.fillStyle = "black";
                       ctx.fillText(e.data.plabels[i], parseFloat(e.data.pcx[i]) - parseFloat(gr.pointRadius) - 5, parseFloat(e.data.pcy[i]) + parseFloat(gr.pointRadius));
-                      
-                      // var textNode2 = document.createTextNode(e.data.plabels[i]);
-                      // image6 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                      // image6.setAttribute('x', parseFloat(e.data.pcx[i]) + parseFloat(gr.pointRadius) + 5);
-                      // image6.setAttribute('y', parseFloat(e.data.pcy[i]) + parseFloat(gr.pointRadius));
-                      // image6.appendChild(textNode2);
-                      // pointsContainer.appendChild(image6);
                     }
                   }
                 }
@@ -752,27 +873,27 @@ var Graph = function(aobj) {
       } else {
         if (e.data.Right) {
           gr.rightSumValue = e.data.Right;
-          // MathJax.Hub.Queue(function() {
-          //   if (gr.rightSumValue != "diverges") {
-          //     var rightSum = "<math><mstyle displaystyle='true'><msub><mi>R</mi><mi>n</mi></msub><mo>=</mo><munderover><mo>&#x2211;</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mn>" + N + "</mi></munderover><mrow><mi>f</mi><mo></mo><mrow><mo>(</mo><msub><mi>x</mi><mi>i</mi></msub><mo>)</mo></mrow><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></mstyle><mo>=</mo>";
-          //     $('#' + gr.id + 'Sum').empty().append(rightSum + "<mn>" + gr.rightSumValue + "</mn></mrow></math>" + "<br><span>where </span><math><msub><mi>x</mi><mi>i</mi></msub><mo>=</mo><mn>" + a + "</mn><mo>+</mo><mi>i</mi><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></math>");
-          //   } else {
-          //     $('#' + gr.id + 'Sum').empty().append("Right Sum diverges");
-          //   }
-          // });
-          // MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+          MathJax.Hub.Queue(function() {
+            if (gr.rightSumValue != "diverges") {
+              var rightSum = "<math><mstyle displaystyle='true'><msub><mi>R</mi><mi>n</mi></msub><mo>=</mo><munderover><mo>&#x2211;</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mn>" + N + "</mi></munderover><mrow><mi>f</mi><mo></mo><mrow><mo>(</mo><msub><mi>x</mi><mi>i</mi></msub><mo>)</mo></mrow><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></mstyle><mo>=</mo>";
+              $('#' + gr.id + 'Sum').empty().append(rightSum + "<mn>" + gr.rightSumValue + "</mn></mrow></math>" + "<br><span>where </span><math><msub><mi>x</mi><mi>i</mi></msub><mo>=</mo><mn>" + a + "</mn><mo>+</mo><mi>i</mi><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></math>");
+            } else {
+              $('#' + gr.id + 'Sum').empty().append("Right Sum diverges");
+            }
+          });
+          MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
         }
         if (e.data.Left) {
           gr.leftSumValue = e.data.Left;
-          // MathJax.Hub.Queue(function() {
-          //   if (gr.leftSumValue != "diverges") {
-          //     var leftSum = "<math><mstyle displaystyle='true'><msub><mi>L</mi><mi>n</mi></msub><mo>=</mo><munderover><mo>&#x2211;</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mn>" + N + "</mn></munderover><mrow><mi>f</mi><mo></mo><mrow><mo>(</mo><msub><mi>x</mi><mrow><mi>i</mi><mo>&#x2212;</mo><mn>1</mn></mrow></msub><mo>)</mo></mrow><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></mstyle><mo>=</mo>";
-          //     $('#' + gr.id + 'Sum').empty().append(leftSum + "<mn>" + gr.leftSumValue + "</mn></mrow></math>" + "<br><span>where </span><math><msub><mi>x</mi><mi>i</mi></msub><mo>=</mo><mn>" + a + "</mn><mo>+</mo><mi>i</mi><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></math>");
-          //   } else {
-          //     $('#' + gr.id + 'Sum').empty().append("Left Sum diverges");
-          //   }
-          // });
-          // MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+          MathJax.Hub.Queue(function() {
+            if (gr.leftSumValue != "diverges") {
+              var leftSum = "<math><mstyle displaystyle='true'><msub><mi>L</mi><mi>n</mi></msub><mo>=</mo><munderover><mo>&#x2211;</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mn>" + N + "</mn></munderover><mrow><mi>f</mi><mo></mo><mrow><mo>(</mo><msub><mi>x</mi><mrow><mi>i</mi><mo>&#x2212;</mo><mn>1</mn></mrow></msub><mo>)</mo></mrow><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></mstyle><mo>=</mo>";
+              $('#' + gr.id + 'Sum').empty().append(leftSum + "<mn>" + gr.leftSumValue + "</mn></mrow></math>" + "<br><span>where </span><math><msub><mi>x</mi><mi>i</mi></msub><mo>=</mo><mn>" + a + "</mn><mo>+</mo><mi>i</mi><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></math>");
+            } else {
+              $('#' + gr.id + 'Sum').empty().append("Left Sum diverges");
+            }
+          });
+          MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
         }
         if (e.data.Integral) {
           if (Array.isArray(e.data.Integral)) {
@@ -806,22 +927,22 @@ var Graph = function(aobj) {
 
             finalValue = gr.evaluateEquation(toDisplaySum.replace("=", ""));
 
-            // MathJax.Hub.Queue(function() {
+            MathJax.Hub.Queue(function() {
 
-            //   $('#' + gr.id + 'Sum').empty().append(toDisplayInt + toDisplaySum + finalValue + "`");
+              $('#' + gr.id + 'Sum').empty().append(toDisplayInt + toDisplaySum + finalValue + "`");
 
-            // });
-            // MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+            });
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
           } else {
             gr.integralValue = e.data.Integral;
-            // MathJax.Hub.Queue(function() {
-            //   if (gr.integralValue != "diverges" && !isNaN(gr.integralValue)) {
-            //     $('#' + gr.id + 'Sum').empty().append("`int_(" + a + ")^(" + b + ")" + equationToEval + " dx = " + gr.integralValue + "`");
-            //   } else {
-            //     $('#' + gr.id + 'Sum').empty().append("`int_(" + a + ")^(" + b + ")" + equationToEval + " dx `" + " " + gr.integralValue);
-            //   }
-            // });
-            // MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+            MathJax.Hub.Queue(function() {
+              if (gr.integralValue != "diverges" && !isNaN(gr.integralValue)) {
+                $('#' + gr.id + 'Sum').empty().append("`int_(" + a + ")^(" + b + ")" + equationToEval + " dx = " + gr.integralValue + "`");
+              } else {
+                $('#' + gr.id + 'Sum').empty().append("`int_(" + a + ")^(" + b + ")" + equationToEval + " dx `" + " " + gr.integralValue);
+              }
+            });
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
           }
         }
         sumWork.terminate();
@@ -832,8 +953,8 @@ var Graph = function(aobj) {
   };
 
   this.createEquation = function() {
-    // MathJax.Hub.Queue(function() { document.getElementById('equationList').innerHTML = "`f(x)=" + this.equationToEval + "`" });
-    // MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+    MathJax.Hub.Queue(function() { document.getElementById('equationList').innerHTML = "`f(x)=" + this.equationToEval + "`" });
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
 
   };
 

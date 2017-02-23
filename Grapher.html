@@ -15,20 +15,32 @@
 </head>
 
 <body>
-  <h1>Grapher Testing</h1>
+  <h1>Grapher Stress Testing</h1>
   <section>
+    <div id='multiGraph'>
+      <h3>Multiple Graphs</h3>
+      <pre class="prettyprint lang-js" style="background: #eff">
+          var multiGraph = new Graph({
+            id: 'multiGraph',
+            equationToEval: ['x','x^x','nthRoot(x,3)'],
+            yScale: 2,
+            xScale: 2,
+            type: 'cartesian'
+          });
+      </pre>
+    </div>
     <div id='left'>
       <h3>Left Sum</h3>
       <pre class="prettyprint lang-js" style="background: #eff">
         var left = new Graph({
           id: 'left',
           equationToEval: 'x',
-          a: 0,
+          a: -5,
           b: 2,
-          N: 4,
+          N: 10,
           yScale: 2,
           xScale: 2,
-          minX: -20,
+          minX: -6,
           type: 'leftsum'
         });
       </pre>
@@ -69,7 +81,7 @@
           b: [2, -1, 8],
           type: 'integral'
         });
-      </pre> 
+      </pre>
     </div>
     <div id='shadeToX'>
       <h3>Shade To X</h3>
@@ -81,7 +93,7 @@
           b: 2,
           shadeToX: true
         });
-      </pre> 
+      </pre>
     </div>
     <div id='shadeToX2'>
       <h3>Shade To X [Multiple Regions]</h3>
@@ -93,7 +105,7 @@
           b: [2, 5, 8],
           shadeToX: true
         });
-      </pre> 
+      </pre>
     </div>
     <div id='exponential'>
       <h3>Exponential Distribution</h3>
@@ -107,7 +119,7 @@
           minX: 0,
           yScale: 0.5
         });
-      </pre> 
+      </pre>
     </div>
     <div id='arcsine'>
       <h3>Arcsine Distribution</h3>
@@ -121,7 +133,7 @@
           minX: 0,
           yScale: 0.5
         });
-      </pre> 
+      </pre>
     </div>
     <div id='normal'>
       <h3>Normal</h3>
@@ -135,7 +147,7 @@
           minX: -4,
           yScale: 0.1
         });
-      </pre> 
+      </pre>
     </div>
     <div id='normal2'>
       <h3>Normal Shade To X</h3>
@@ -152,7 +164,7 @@
           shadeToX: true,
           yScale: 0.1
         });
-      </pre> 
+      </pre>
     </div>
     <div id='normal3'>
       <h3>Normal Shade To X [Multiple Regions]</h3>
@@ -169,7 +181,7 @@
           b: [2, -1],
           yScale: 0.1
         });
-      </pre> 
+      </pre>
     </div>
     <div id='points'>
       <h3>Points</h3>
@@ -178,7 +190,7 @@
           id: 'points',
           points: ['(3,1)', '(5,-2)']
         });
-      </pre> 
+      </pre>
     </div>
     <div id='pointsLabelled'>
       <h3>Points Labelled</h3>
@@ -188,7 +200,7 @@
           points: ['(3,1)', '(5,-2)'],
           labelPoints: true
         });
-      </pre> 
+      </pre>
     </div>
     <div id='pointsOnGraph'>
       <h3>Points On A Graph</h3>
@@ -198,7 +210,7 @@
           equationToEval: 'x^2',
           pointsOnGraph: [3, 2, -5]
         });
-      </pre> 
+      </pre>
     </div>
     <div id='pointsOnGraphLabelled'>
       <h3>Points On A Graph Selectively Labelled</h3>
@@ -209,43 +221,121 @@
           pointsOnGraph: [3, 2, -5],
           labelPoints: [true, false, true]
         });
-      </pre> 
+      </pre>
     </div>
     <div id='canvas'>
       <h3>Canvas</h3>
       <pre class="prettyprint lang-js" style="background: #eff">
-        
-      </pre> 
+        var canvas = new Graph({
+          id: 'canvas',
+          equationToEval: 'x',
+          render: 'canvas',
+          points: ['(3,1)', '(5,-2)'],
+          labelPoints: true
+        });
+      </pre>
     </div>
     <div id='canvasLeft'>
       <h3>Canvas Left</h3>
       <pre class="prettyprint lang-js" style="background: #eff">
-        
-      </pre> 
+        var canvasLeft = new Graph({
+          id: 'canvasLeft',
+          equationToEval: '-x - 9',
+          render: 'canvas',
+          a: 0,
+          b: 2,
+          N: 4,
+          yScale: 2,
+          xScale: 2,
+          minX: -20,
+          type: 'leftsum'
+        });
+      </pre>
     </div>
     <div id='canvasRight'>
       <h3>Canvas Right</h3>
       <pre class="prettyprint lang-js" style="background: #eff">
-        
-      </pre> 
+        var canvasRight = new Graph({
+          id: 'canvasRight',
+          equationToEval: 'x + 9',
+          render: 'canvas',
+          type: 'right',
+          a: 0,
+          b: 2,
+          N: 4,
+          type: 'rightsum'
+        });
+      </pre>
     </div>
     <div id='canvasIntegral'>
       <h3>Canvas Integral</h3>
       <pre class="prettyprint lang-js" style="background: #eff">
-        
-      </pre> 
+        var canvasIntegral = new Graph({
+          id: 'canvasIntegral',
+          equationToEval: '1/x',
+          render: 'canvas',
+          a: -1,
+          b: 2,
+          xScale: 0.5,
+          type: 'integral',
+          pointsOnGraph: [3, 2, -5],
+          labelPoints: true
+        });
+      </pre>
+    </div>
+    <div id='chisquare'>
+      <h3>Chi-Square</h3>
+      <pre class="prettyprint lang-js" style="background: #eff">
+          var chisquare = new Graph({
+            id: 'chisquare',
+            maxY: 0.5,
+            minY: 0,
+            maxX: 8,
+            minX: 0,
+            type: 'chi-square',
+            degreesOfFreedom: 3,
+            yScale: 0.1
+          });
+      </pre>
+    </div>
+    <div id='fdistribution'>
+      <h3>F-Distribution</h3>
+      <pre class="prettyprint lang-js" style="background: #eff">
+          var f = new Graph({
+            id: 'fdistribution',
+            maxY: 0.6,
+            minY: 0,
+            maxX: 8,
+            minX: 0,
+            type: 'f',
+            a:[0.5,2],
+            b:[1,3],
+            degreesOfFreedom: 5,
+            degreesOfFreedom2: 2,
+            yScale: 0.1,
+            shadeToX: true,
+            pointsOnGraph: [1,0.5,2,3]
+          });
+      </pre>
     </div>
   </section>
   <script>
+  var multiGraph = new Graph({
+    id: 'multiGraph',
+    equationToEval: ['x','x^x','nthRoot(x,3)'],
+    yScale: 2,
+    xScale: 2,
+    type: 'cartesian'
+  });
   var left = new Graph({
     id: 'left',
     equationToEval: 'x',
-    a: 0,
+    a: -5,
     b: 2,
-    N: 4,
+    N: 10,
     yScale: 2,
     xScale: 2,
-    minX: -20,
+    minX: -6,
     type: 'leftsum'
   });
   var right = new Graph({
@@ -395,6 +485,31 @@
     type: 'integral',
     pointsOnGraph: [3, 2, -5],
     labelPoints: true
+  });
+  var chisquare = new Graph({
+    id: 'chisquare',
+    maxY: 0.5,
+    minY: 0,
+    maxX: 8,
+    minX: 0,
+    type: 'chi-square',
+    degreesOfFreedom: 3,
+    yScale: 0.1
+  });
+  var f = new Graph({
+    id: 'fdistribution',
+    maxY: 0.6,
+    minY: 0,
+    maxX: 8,
+    minX: 0,
+    type: 'f',
+    a:[0.5,2],
+    b:[1,3],
+    degreesOfFreedom: 5,
+    degreesOfFreedom2: 2,
+    yScale: 0.1,
+    shadeToX: true,
+    pointsOnGraph: [1,0.5,2,3]
   });
   </script>
 </body>
