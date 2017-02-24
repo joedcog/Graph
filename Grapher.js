@@ -142,111 +142,148 @@ var Graph = function(aobj) {
   }
   if (aobj.type) {
     this.type = aobj.type;
-    if (this.type.toLowerCase() == "normal") {
-      if (aobj.stdev) {
-        this.stdev = parseFloat(aobj.stdev);
-      } else {
-        this.stdev = 1;
-      }
-      if (aobj.mean) {
-        this.mean = parseFloat(aobj.mean);
-      } else {
-        this.mean = 0;
-      }
-      this.equationToEval = '(1 / sqrt(2 * o^2 * pi) * e^(-1 * ((x - u)^2) / (2 * o^2)))';
-      this.equationToEval = this.equationToEval.replace(new RegExp("o", 'g'), "(" + this.stdev + ")");
-      this.equationToEval = this.equationToEval.replace(new RegExp("u", 'g'), "(" + this.mean + ")");
-    } else if (this.type.toLowerCase() == "arcsine") {
-      this.equationToEval = '1/(pi*sqrt(x(1-x)))';
-    } else if (this.type.toLowerCase() == "exponential") {
-      if (aobj.lambda) {
-        this.lambda = parseFloat(aobj.lambda);
-      } else {
-        this.lambda = 1;
-      }
-      this.equationToEval = '(lambda * e ^ (-lambdax))';
-      this.equationToEval = this.equationToEval.replace(new RegExp("lambda", 'g'), "(" + this.lambda + ")");
-    } else if (this.type.toLowerCase() == "chi-square") {
-      if (aobj.degreesOfFreedom) {
-        this.degreesOfFreedom = parseFloat(aobj.degreesOfFreedom);
-      } else {
-        this.degreesOfFreedom = 1;
-      }
-      this.gammaVal = gamma(this.degreesOfFreedom / 2);
-      this.equationToEval = '((x^((k/2)-1))*(e^(-x/2)))/((2^(k/2))*' + this.gammaVal + ')';
-      this.equationToEval = this.equationToEval.replace(new RegExp("k", 'g'), "(" + this.degreesOfFreedom + ")");
-    } else if (this.type.toLowerCase() == "f") {
-      if (aobj.degreesOfFreedom) {
-        this.degreesOfFreedom = parseFloat(aobj.degreesOfFreedom);
-      } else {
-        this.degreesOfFreedom = 1;
-      }
-      if (aobj.degreesOfFreedom2) {
-        this.degreesOfFreedom2 = parseFloat(aobj.degreesOfFreedom2);
-      } else {
-        this.degreesOfFreedom2 = 1;
-      }
-      this.betaVal = beta(this.degreesOfFreedom / 2, this.degreesOfFreedom2 / 2);
-      this.equationToEval = '(sqrt((((ax)^(a))*(b^b))/((ax+b)^(a+b))))/(x*' + this.betaVal + ')';
-      this.equationToEval = this.equationToEval.replace(new RegExp("a", 'g'), "(" + this.degreesOfFreedom + ")");
-      this.equationToEval = this.equationToEval.replace(new RegExp("b", 'g'), "(" + this.degreesOfFreedom2 + ")");
-    }
   } else {
     this.type = "null";
   }
   if (aobj.equationToEval) {
-    this.equationToEval = aobj.equationToEval;
+    if (Array.isArray(aobj.equationToEval)) {
+      this.equationToEval = [];
+      for (var i = 0; i < aobj.equationToEval.length; i++) {
+        if (aobj.equationToEval[i].toLowerCase() === "normal") {
+          if (aobj.stdev) {
+            if (Array.isArray(aobj.stdev)) {
+              this.stdev = parseFloat(aobj.stdev[i]);
+            } else {
+              this.stdev = parseFloat(aobj.stdev);
+            }
+
+          } else {
+            this.stdev = 1;
+          }
+          if (aobj.mean) {
+            if (Array.isArray(aobj.mean)) {
+              this.mean = parseFloat(aobj.mean[i]);
+            } else {
+              this.mean = parseFloat(aobj.mean);
+            }
+          } else {
+            this.mean = 0;
+          }
+          this.equationToEval.push('(1 / sqrt(2 * o^2 * pi) * e^(-1 * ((x - u)^2) / (2 * o^2)))');
+          this.equationToEval[i] = this.equationToEval[i].replace(new RegExp("o", 'g'), "(" + this.stdev + ")");
+          this.equationToEval[i] = this.equationToEval[i].replace(new RegExp("u", 'g'), "(" + this.mean + ")");
+        } else if (aobj.equationToEval[i].toLowerCase() === "arcsine") {
+          this.equationToEval.push('1/(pi*sqrt(x(1-x)))');
+        } else if (aobj.equationToEval[i].toLowerCase() == "exponential") {
+          if (aobj.lambda) {
+            if (Array.isArray(aobj.lambda)) {
+              this.lambda = parseFloat(aobj.lambda[i]);
+            } else {
+              this.lambda = parseFloat(aobj.lambda);
+            }
+
+          } else {
+            this.lambda = 1;
+          }
+          this.equationToEval.push('(lambda * e ^ (-lambdax))');
+          this.equationToEval[i] = this.equationToEval[i].replace(new RegExp("lambda", 'g'), "(" + this.lambda + ")");
+        } else if (aobj.equationToEval[i].toLowerCase() == "chi-square") {
+          if (aobj.degreesOfFreedom) {
+            if (Array.isArray(aobj.degreesOfFreedom)) {
+              this.degreesOfFreedom = parseFloat(aobj.degreesOfFreedom[i]);
+            } else {
+              this.degreesOfFreedom = parseFloat(aobj.degreesOfFreedom);
+            }
+          } else {
+            this.degreesOfFreedom = 1;
+          }
+          this.gammaVal = gamma(this.degreesOfFreedom / 2);
+          this.equationToEval.push('((x^((k/2)-1))*(e^(-x/2)))/((2^(k/2))*' + this.gammaVal + ')');
+          this.equationToEval[i] = this.equationToEval[i].replace(new RegExp("\k", 'g'), "(" + this.degreesOfFreedom + ")");
+        } else if (aobj.equationToEval[i].toLowerCase() == "f") {
+          if (aobj.degreesOfFreedom) {
+            if (Array.isArray(aobj.degreesOfFreedom)) {
+              this.degreesOfFreedom = parseFloat(aobj.degreesOfFreedom[i]);
+            } else {
+              this.degreesOfFreedom = parseFloat(aobj.degreesOfFreedom);
+            }
+          } else {
+            this.degreesOfFreedom = 1;
+          }
+          if (aobj.degreesOfFreedom2) {
+            if (Array.isArray(aobj.degreesOfFreedom2)) {
+              this.degreesOfFreedom2 = parseFloat(aobj.degreesOfFreedom2[i]);
+            } else {
+              this.degreesOfFreedom2 = parseFloat(aobj.degreesOfFreedom2);
+            }
+          } else {
+            this.degreesOfFreedom2 = 1;
+          }
+          this.betaVal = beta(this.degreesOfFreedom / 2, this.degreesOfFreedom2 / 2);
+          this.equationToEval.push('(sqrt((((ax)^(a))*(b^b))/((ax+b)^(a+b))))/(x*' + this.betaVal + ')');
+          this.equationToEval[i] = this.equationToEval[i].replace(new RegExp("a", 'g'), "(" + this.degreesOfFreedom + ")");
+          this.equationToEval[i] = this.equationToEval[i].replace(new RegExp("b", 'g'), "(" + this.degreesOfFreedom2 + ")");
+        } else {
+          this.equationToEval.push(aobj.equationToEval[i]);
+        }
+      }
+    } else {
+      if (aobj.equationToEval.toLowerCase() === "normal") {
+        if (aobj.stdev) {
+          this.stdev = parseFloat(aobj.stdev);
+        } else {
+          this.stdev = 1;
+        }
+        if (aobj.mean) {
+          this.mean = parseFloat(aobj.mean);
+        } else {
+          this.mean = 0;
+        }
+        this.equationToEval = '(1 / sqrt(2 * o^2 * pi) * e^(-1 * ((x - u)^2) / (2 * o^2)))';
+        this.equationToEval = this.equationToEval.replace(new RegExp("o", 'g'), "(" + this.stdev + ")");
+        this.equationToEval = this.equationToEval.replace(new RegExp("u", 'g'), "(" + this.mean + ")");
+      } else if (aobj.equationToEval.toLowerCase() === "arcsine") {
+        this.equationToEval = '1/(pi*sqrt(x(1-x)))';
+      } else if (aobj.equationToEval.toLowerCase() == "exponential") {
+        if (aobj.lambda) {
+          this.lambda = parseFloat(aobj.lambda);
+        } else {
+          this.lambda = 1;
+        }
+        this.equationToEval = '(lambda * e ^ (-lambdax))';
+        this.equationToEval = this.equationToEval.replace(new RegExp("lambda", 'g'), "(" + this.lambda + ")");
+      } else if (aobj.equationToEval.toLowerCase() == "chi-square") {
+        if (aobj.degreesOfFreedom) {
+          this.degreesOfFreedom = parseFloat(aobj.degreesOfFreedom);
+        } else {
+          this.degreesOfFreedom = 1;
+        }
+        this.gammaVal = gamma(this.degreesOfFreedom / 2);
+        this.equationToEval = '((x^((k/2)-1))*(e^(-x/2)))/((2^(k/2))*' + this.gammaVal + ')';
+        this.equationToEval = this.equationToEval.replace(new RegExp("\k", 'g'), "(" + this.degreesOfFreedom + ")");
+      } else if (aobj.equationToEval.toLowerCase() == "f") {
+        if (aobj.degreesOfFreedom) {
+          this.degreesOfFreedom = parseFloat(aobj.degreesOfFreedom);
+        } else {
+          this.degreesOfFreedom = 1;
+        }
+        if (aobj.degreesOfFreedom2) {
+          this.degreesOfFreedom2 = parseFloat(aobj.degreesOfFreedom2);
+        } else {
+          this.degreesOfFreedom2 = 1;
+        }
+        this.betaVal = beta(this.degreesOfFreedom / 2, this.degreesOfFreedom2 / 2);
+        this.equationToEval = '(sqrt((((ax)^(a))*(b^b))/((ax+b)^(a+b))))/(x*' + this.betaVal + ')';
+        this.equationToEval = this.equationToEval.replace(new RegExp("a", 'g'), "(" + this.degreesOfFreedom + ")");
+        this.equationToEval = this.equationToEval.replace(new RegExp("b", 'g'), "(" + this.degreesOfFreedom2 + ")");
+      } else {
+        this.equationToEval = aobj.equationToEval;
+      }
+    }
+
   } else {
     if (this.type.toLowerCase() == 'cartesian' || this.type.toLowerCase() == 'leftsum' || this.type.toLowerCase() == 'rightsum' || this.type.toLowerCase() == 'integral' || !this.type) {
       throw ("You must submit an equation to evaluate.");
-    } else if (this.type == 'normal') {
-      if (aobj.stdev) {
-        this.stdev = parseFloat(aobj.stdev);
-      } else {
-        this.stdev = 1;
-      }
-      if (aobj.mean) {
-        this.mean = parseFloat(aobj.mean);
-      } else {
-        this.mean = 0;
-      }
-      this.equationToEval = '(1 / sqrt(2 * o^2 * pi) * e^(-1 * ((x - u)^2) / (2 * o^2)))';
-      this.equationToEval = this.equationToEval.replace(new RegExp("o", 'g'), "(" + this.stdev + ")");
-      this.equationToEval = this.equationToEval.replace(new RegExp("u", 'g'), "(" + this.mean + ")");
-    } else if (this.type.toLowerCase() == "arcsine") {
-      this.equationToEval = '1/(pi*sqrt(x(1-x)))';
-    } else if (this.type.toLowerCase() == "exponential") {
-      if (aobj.lambda) {
-        this.lambda = parseFloat(aobj.lambda);
-      } else {
-        this.lambda = 1;
-      }
-      this.equationToEval = '(lambda * e ^ (-lambdax))';
-      this.equationToEval = this.equationToEval.replace(new RegExp("lambda", 'g'), "(" + this.lambda + ")");
-    } else if (this.type.toLowerCase() == "chi-square") {
-      if (aobj.degreesOfFreedom) {
-        this.degreesOfFreedom = parseFloat(aobj.degreesOfFreedom);
-      } else {
-        this.degreesOfFreedom = 1;
-      }
-      this.gammaVal = gamma(this.degreesOfFreedom / 2);
-      this.equationToEval = '((x^((k/2)-1))*(e^(-x/2)))/((2^(k/2))*' + this.gammaVal + ')';
-      this.equationToEval = this.equationToEval.replace(new RegExp("\k", 'g'), "(" + this.degreesOfFreedom + ")");
-    } else if (this.type.toLowerCase() == "f") {
-      if (aobj.degreesOfFreedom) {
-        this.degreesOfFreedom = parseFloat(aobj.degreesOfFreedom);
-      } else {
-        this.degreesOfFreedom = 1;
-      }
-      if (aobj.degreesOfFreedom2) {
-        this.degreesOfFreedom2 = parseFloat(aobj.degreesOfFreedom2);
-      } else {
-        this.degreesOfFreedom2 = 1;
-      }
-      this.betaVal = beta(this.degreesOfFreedom / 2, this.degreesOfFreedom2 / 2);
-      this.equationToEval = '(sqrt((((ax)^(a))*(b^b))/((ax+b)^(a+b))))/(x*' + this.betaVal + ')';
-      this.equationToEval = this.equationToEval.replace(new RegExp("a", 'g'), "(" + this.degreesOfFreedom + ")");
-      this.equationToEval = this.equationToEval.replace(new RegExp("b", 'g'), "(" + this.degreesOfFreedom2 + ")");
     } else {
       this.equationToEval = '';
     }
