@@ -396,6 +396,8 @@ var Graph = function(aobj) {
 
       svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
       svg.setAttribute('viewBox', "0 0 500 500");
+      svg.setAttribute('width', "500");
+      svg.setAttribute('height', "500")
       var axisSym = document.createElementNS('http://www.w3.org/2000/svg', 'symbol');
       axisSym.setAttribute('id', this.id + "AxisSymbol");
 

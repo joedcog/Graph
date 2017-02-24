@@ -12,6 +12,11 @@
   <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.7.0/math.js"></script>
   <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+  <style>
+    figure{
+        text-align:center;
+    }
+  </style>
 </head>
 
 <body>
@@ -22,7 +27,7 @@
       <pre class="prettyprint lang-js" style="background: #eff">
           var multiGraph = new Graph({
             id: 'multiGraph',
-            equationToEval: ['x','x^x','nthRoot(x,3)'],
+            equationToEval: ['x','2x','5x'],
             yScale: 2,
             xScale: 2,
             type: 'cartesian'
@@ -322,7 +327,7 @@
   <script>
   var multiGraph = new Graph({
     id: 'multiGraph',
-    equationToEval: ['x','x^x','nthRoot(x,3)'],
+    equationToEval: ['x','2x','5x'],
     yScale: 2,
     xScale: 2,
     type: 'cartesian'
