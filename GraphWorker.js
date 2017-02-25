@@ -220,7 +220,7 @@ self.addEventListener('message', function(e) {
       }
       dataToPass.rect2 = path;
     }
-    if (e.data.type == "integral" || e.data.shadeToX) {
+    if (e.data.type == "integral" || e.data.shadeToX || e.data.type == "areaUnderCurve") {
       if (Array.isArray(a) && Array.isArray(b) && a.length == b.length) {
         dataToPass.shade = [];
         for (var i = 0; i < a.length; i++) {

@@ -223,6 +223,20 @@ var Graph = function(aobj) {
           this.equationToEval.push('(sqrt((((ax)^(a))*(b^b))/((ax+b)^(a+b))))/(x*' + this.betaVal + ')');
           this.equationToEval[i] = this.equationToEval[i].replace(new RegExp("a", 'g'), "(" + this.degreesOfFreedom + ")");
           this.equationToEval[i] = this.equationToEval[i].replace(new RegExp("b", 'g'), "(" + this.degreesOfFreedom2 + ")");
+        } else if (aobj.equationToEval[i].toLowerCase() == "studentt") {
+          if (aobj.degreesOfFreedom) {
+            if (Array.isArray(aobj.degreesOfFreedom)) {
+              this.degreesOfFreedom = parseFloat(aobj.degreesOfFreedom[i]);
+            } else {
+              this.degreesOfFreedom = parseFloat(aobj.degreesOfFreedom);
+            }
+          } else {
+            this.degreesOfFreedom = 1;
+          }
+          this.gammaVal = gamma((this.degreesOfFreedom + 1) / 2);
+          this.equationToEval.push('(' + this.gammaVal + '/(sqrt(k*Math.PI)*' + gamma(this.degreesOfFreedom / 2) + '))*((1+((x^2)/k))^(-1*(k+1)/2))');
+          this.equationToEval[i] = this.equationToEval[i].replace(new RegExp("\k", 'g'), "(" + this.degreesOfFreedom + ")");
+
         } else {
           this.equationToEval.push(aobj.equationToEval[i]);
         }
@@ -276,6 +290,20 @@ var Graph = function(aobj) {
         this.equationToEval = '(sqrt((((ax)^(a))*(b^b))/((ax+b)^(a+b))))/(x*' + this.betaVal + ')';
         this.equationToEval = this.equationToEval.replace(new RegExp("a", 'g'), "(" + this.degreesOfFreedom + ")");
         this.equationToEval = this.equationToEval.replace(new RegExp("b", 'g'), "(" + this.degreesOfFreedom2 + ")");
+      } else if (aobj.equationToEval.toLowerCase() == "studentt") {
+        if (aobj.degreesOfFreedom) {
+          if (Array.isArray(aobj.degreesOfFreedom)) {
+            this.degreesOfFreedom = parseFloat(aobj.degreesOfFreedom[i]);
+          } else {
+            this.degreesOfFreedom = parseFloat(aobj.degreesOfFreedom);
+          }
+        } else {
+          this.degreesOfFreedom = 1;
+        }
+        this.gammaVal = gamma((this.degreesOfFreedom + 1) / 2);
+        this.equationToEval = '(' + this.gammaVal + '/(sqrt(k*' + Math.PI + ')*' + gamma(this.degreesOfFreedom / 2) + '))*((1+((x^2)/k))^(-1*(k+1)/2))';
+        this.equationToEval = this.equationToEval.replace(new RegExp("\k", 'g'), "(" + this.degreesOfFreedom + ")");
+
       } else {
         this.equationToEval = aobj.equationToEval;
       }
@@ -288,16 +316,26 @@ var Graph = function(aobj) {
       this.equationToEval = '';
     }
   }
-  if (aobj.showXAxisGrid || aobj.showYAxisGrid == false) {
-    this.showXAxisGrid = aobj.showXAxisGrid;
+  if (aobj.showXAxisGrid != null) {
+    if (aobj.showXAxisGrid.toLowerCase() === 'false' || aobj.showXAxisGrid == false) {
+      this.showXAxisGrid = false;
+    } else {
+      this.showXAxisGrid = true;
+    }
   } else {
     this.showXAxisGrid = true;
   }
-  if (aobj.showYAxisGrid || aobj.showYAxisGrid == false) {
-    this.showYAxisGrid = aobj.showYAxisGrid;
+  if (aobj.showYAxisGrid != null) {
+    console.log(aobj.showYAxisGrid);
+    if (aobj.showYAxisGrid.toLowerCase() === 'false' || aobj.showYAxisGrid == false) {
+      this.showYAxisGrid = false;
+    } else {
+      this.showYAxisGrid = true;
+    }
   } else {
     this.showYAxisGrid = true;
   }
+
   if (aobj.labelPoints) {
     this.labelPoints = aobj.labelPoints;
   }
@@ -450,22 +488,21 @@ var Graph = function(aobj) {
       graphsym.setAttribute('viewBox', "0 0 500 500");
       graphsym.setAttribute('width', '100%');
       graphsym.setAttribute('height', '100%');
-
-
-
       graphG.appendChild(use);
       svg.appendChild(axisSym);
       svg.appendChild(axisG);
       svg.appendChild(graphG);
       svg.appendChild(graphsym);
       figure.appendChild(svg);
-      if (this.type == 'integral' || this.type == 'leftsum' || this.type == 'rightsum') {
+
+      if (this.type == 'integral' || this.type == 'leftsum' || this.type == 'rightsum' || this.type == 'areaUnderCurve') {
         var figcap = document.createElement('figcaption');
         figcap.setAttribute('id', this.id + 'Sum');
         figure.appendChild(figcap);
       }
 
       document.getElementById(this.id).appendChild(figure);
+
       if (this.drawAxis) {
         this.drawGraphAxis();
       }
@@ -581,6 +618,7 @@ var Graph = function(aobj) {
     x = this.minX;
     var i = this.sidePadding;
     if (this.showYAxisGrid) {
+      console.log(this.degreesOfFreedom);
       for (j = this.minX; j <= this.maxX; j += this.xScale) {
 
 
@@ -1032,6 +1070,9 @@ var Graph = function(aobj) {
             });
             MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
           }
+        }
+        if (e.data.areaUnderCurve) {
+          $('#' + gr.id + 'Sum').empty().append(e.data.areaUnderCurve);
         }
         sumWork.terminate();
         $('#popup').toggleClass("none");

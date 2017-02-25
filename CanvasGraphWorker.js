@@ -41,7 +41,7 @@ self.addEventListener('message', function(e) {
   var dataToPass = {};
   var prevY = null;
   widthx = 460 / Math.abs(parseFloat(tinyX) - parseFloat(largeX));
-  resolution = widthx;
+  resolution = widthx*8;
   yAxisPosition = 20 + (-1 * widthx * (parseFloat(tinyX)));
   widthy = 460 / Math.abs(parseFloat(tinyY) - parseFloat(largeY));
   xAxisPosition = 20 + (widthy * (parseFloat(largeY)));
@@ -187,7 +187,7 @@ self.addEventListener('message', function(e) {
       path = path + "ctx.stroke(); ";
       dataToPass.rect2 = path;
     }
-    if (e.data.type == "integral" || e.data.shadeToX) {
+    if (e.data.type == "integral" || e.data.shadeToX || e.data.type == "areaUnderCurve") {
       if (Array.isArray(a) && Array.isArray(b) && a.length == b.length) {
         dataToPass.shade = [];
         for (var i = 0; i < a.length; i++) {

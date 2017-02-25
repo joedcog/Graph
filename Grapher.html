@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang='en'>
 
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -343,6 +343,21 @@
           });
       </pre>
     </div>
+    <div id='tdist'>
+      <h3>Student's t-distribution</h3>
+      <pre class="prettyprint lang-js" style="background: #eff">
+          var tdist = new Graph({
+            id: 'tdist',
+            maxY: 0.6,
+            minY: 0,
+            maxX: 8,
+            minX: 0,
+            equationToEval: 'studentt',
+            degreesOfFreedom: 7,
+            yScale: 0.1
+          });
+      </pre>
+    </div>
   </section>
   <script>
   var multiGraph = new Graph({
@@ -548,8 +563,18 @@
     degreesOfFreedom: 5,
     degreesOfFreedom2: 2,
     yScale: 0.1,
-    type: "integral",
+    type: "areaUnderCurve",
     pointsOnGraph: [1,0.5,2,3]
+  });
+  var tdist = new Graph({
+    id: 'tdist',
+    maxY: 0.4,
+    minY: 0,
+    maxX: 6,
+    minX: -6,
+    equationToEval: 'studentt',
+    degreesOfFreedom: 7,
+    yScale: 0.1
   });
   </script>
 </body>

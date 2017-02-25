@@ -189,6 +189,123 @@ self.addEventListener('message', function(e) {
       dataToPost.Integral = integralValue;
     }
   }
+  if(e.data.type == "areaUnderCurve"){
+    self.postMessage({ 'msg': 'Calculating Integral' });
+    if (Array.isArray(a) && Array.isArray(b) && a.length == b.length) {
+      dataToPost.areaUnderCurve = [];
+      for (var l = 0; l < a.length; l++) {
+        integralValue = 0;
+        var xVal = b[l];
+        var size = 350;
+        var tempY = 0;
+        var prevYVal = 0;
+        for (var i = 0; i < size * (b[l] - a[l]); i++) {
+          if (xVal - (1 / size) < a[l]) {
+            tempY = ((evaluateEquation(equationToEval, xVal) + evaluateEquation(equationToEval, a[l])) * .5 * (1 / size));
+          } else {
+            tempY = ((evaluateEquation(equationToEval, xVal) + evaluateEquation(equationToEval, xVal - (1 / size))) * .5 * (1 / size));
+          }
+          ////console.log(tempY + ' ' + (xVal-(1/size)));
+          // integralValue +   = parseFloat(tempY.toFixed(6));
+          // xVal = xVal - (1 / size);
+          if (i > 0) {
+            if (!isFinite(tempY)) {
+              integralValue = "diverges";
+              //console.log("asymptote in sum");
+              break;
+            } //else if (Math.abs((tempY - prevYVal) / (1 / size)) >= 9999999) {
+            else if (isNaN(tempY)) {
+              integralValue = "diverges";
+              break;
+            } else {
+              integralValue += parseFloat(tempY.toFixed(6));
+
+            }
+          } else {
+            if (isFinite(tempY) && !isNaN(tempY)) {
+              integralValue += parseFloat(tempY.toFixed(6));
+
+            } else if (isNaN(tempY)) {
+              integralValue += parseFloat(evaluateEquation(equationToEval, xVal - (1 / (size * 100))) * (1 / size));
+            }
+          }
+          xVal = xVal - (1 / size);
+          prevYVal = tempY;
+
+        }
+
+        tempY = 0;
+        var prevYVal = 0;
+        var temporary = 0;
+
+        if (integralValue != "diverges" && !isNaN(integralValue)) {
+          //integralValue = (integralValue + temporary) / 2;
+
+          integralValue = parseFloat(integralValue.toFixed(3));
+
+          if (integralValue.toString().length >= 8) {
+            integralValue = integralValue.toExponential(3);
+          }
+        }
+        dataToPost.areaUnderCurve.push(integralValue);
+      }
+    } else {
+      integralValue = 0;
+      var xVal = b;
+      var size = 350;
+      var tempY = 0;
+      var prevYVal = 0;
+      for (var i = 0; i < size * (b - a); i++) {
+        if (xVal - (1 / size) < a) {
+          tempY = ((evaluateEquation(equationToEval, xVal) + evaluateEquation(equationToEval, a)) * .5 * (1 / size));
+        } else {
+          tempY = ((evaluateEquation(equationToEval, xVal) + evaluateEquation(equationToEval, xVal - (1 / size))) * .5 * (1 / size));
+        }
+        ////console.log(tempY + ' ' + (xVal-(1/size)));
+        // integralValue +   = parseFloat(tempY.toFixed(6));
+        // xVal = xVal - (1 / size);
+        if (i > 0) {
+          if (!isFinite(tempY)) {
+            integralValue = "diverges";
+            //console.log("asymptote in sum");
+            break;
+          } //else if (Math.abs((tempY - prevYVal) / (1 / size)) >= 9999999) {
+          else if (isNaN(tempY)) {
+            integralValue = "diverges";
+            break;
+          } else {
+            integralValue += parseFloat(tempY.toFixed(6));
+
+          }
+        } else {
+          if (isFinite(tempY) && !isNaN(tempY)) {
+            integralValue += parseFloat(tempY.toFixed(6));
+
+          } else if (isNaN(tempY)) {
+            integralValue += parseFloat(evaluateEquation(equationToEval, xVal - (1 / (size * 100))) * (1 / size));
+          }
+        }
+        xVal = xVal - (1 / size);
+        prevYVal = tempY;
+
+      }
+
+      tempY = 0;
+      var prevYVal = 0;
+      var temporary = 0;
+
+      if (integralValue != "diverges" && !isNaN(integralValue)) {
+        //integralValue = (integralValue + temporary) / 2;
+
+        integralValue = parseFloat(integralValue.toFixed(3));
+
+        if (integralValue.toString().length >= 8) {
+          integralValue = integralValue.toExponential(3);
+        }
+      }
+      dataToPost.areaUnderCurve = integralValue;
+    }
+  }
   self.postMessage(dataToPost);
 });
 var evaluateEquation = function(equationToEval, x) {
