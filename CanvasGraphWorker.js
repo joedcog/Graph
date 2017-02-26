@@ -20,8 +20,8 @@ self.addEventListener('message', function(e) {
     }
   }
 
-  var svgWidth = 500;
-  var svgHeight = 500;
+  var imageWidth = e.data.imageWidth;
+  var imageHeight = e.data.imageHeight;
   var stopDraw = false;
   var high = false;
   var infinity = false;
@@ -39,15 +39,17 @@ self.addEventListener('message', function(e) {
   var xVal = parseFloat(tinyX); //need object variable to keep up with xVal showing in graph
   var yVal = evaluateEquation(equationToEval, xVal);
   var dataToPass = {};
+  var sidePadding = e.data.sidePadding;
+  var TopBottomPadding = e.data.TopBottomPadding;
   var prevY = null;
-  widthx = 460 / Math.abs(parseFloat(tinyX) - parseFloat(largeX));
-  resolution = widthx*8;
-  yAxisPosition = 20 + (-1 * widthx * (parseFloat(tinyX)));
-  widthy = 460 / Math.abs(parseFloat(tinyY) - parseFloat(largeY));
-  xAxisPosition = 20 + (widthy * (parseFloat(largeY)));
+  widthx = (imageWidth - 2 * sidePadding) / Math.abs(parseFloat(tinyX) - parseFloat(largeX));
+  resolution = widthx;
+  yAxisPosition = sidePadding + (-1 * widthx * (parseFloat(tinyX)));
+  widthy = (imageHeight - 2 * TopBottomPadding) / Math.abs(parseFloat(tinyY) - parseFloat(largeY));
+  xAxisPosition = TopBottomPadding + (widthy * (parseFloat(largeY)));
   var path = "ctx.beginPath();";
   if (equationToEval && equationToEval != '') {
-    for (var i = (20); i < (svgWidth - 20); i += widthx) {
+    for (var i = (20); i < (imageWidth - 20); i += widthx) {
       for (var j = 1; j <= resolution; j++) {
 
         yVal = evaluateEquation(equationToEval, xVal + (j / resolution));
