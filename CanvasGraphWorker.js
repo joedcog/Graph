@@ -50,7 +50,7 @@ self.addEventListener('message', function(e) {
   var path = "ctx.beginPath();";
   if (equationToEval && equationToEval != '') {
     for (var i = (20); i < (imageWidth - 20); i += widthx) {
-      for (var j = 1; j <= resolution; j++) {
+      for (var j = 0; j < resolution; j++) {
 
         yVal = evaluateEquation(equationToEval, xVal + (j / resolution));
 
@@ -291,9 +291,9 @@ self.addEventListener('message', function(e) {
           plabels.push(null);
         }
       }
-      dataToPass.pcx = cx;
-      dataToPass.pcy = cy;
-      dataToPass.plabels = plabels;
+      dataToPass.pcgx = cx;
+      dataToPass.pcgy = cy;
+      dataToPass.pglabels = plabels;
     }
   }
   if (points) {
@@ -303,9 +303,9 @@ self.addEventListener('message', function(e) {
     var cy = [];
     var plabels = [];
     for (var i = 0; i < points.length; i++) {
-      xVal = points[i].match(/-{0,1}\d+/g)[0];
+      xVal = points[i].match(/-{0,1}[\d\.]+/g)[0];
       if (xVal >= parseFloat(tinyX) && xVal <= parseFloat(largeX)) {
-        yVal = points[i].match(/-{0,1}\d+/g)[1];
+        yVal = points[i].match(/-{0,1}[\d\.]+/g)[1];
         if (!isNaN(yVal) && yVal <= parseFloat(largeY) && yVal >= parseFloat(tinyY) && (isFinite(yVal))) {
           cx.push(yAxisPosition + parseFloat(xVal * (widthx)));
           cy.push(xAxisPosition - parseFloat(yVal * widthy));

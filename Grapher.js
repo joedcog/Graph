@@ -224,6 +224,11 @@ var Graph = function(aobj) {
   } else {
     this.labelPoints = false;
   }
+  if (aobj.labelPointsOnGraph != null) {
+    this.labelPointsOnGraph = aobj.labelPointsOnGraph;
+  } else {
+    this.labelPointsOnGraph = false;
+  }
   //aobj.title is the title of a rendered svg... read by screenreaders
   if (aobj.title) {
     this.title = aobj.title;
@@ -258,6 +263,16 @@ var Graph = function(aobj) {
     this.pointRadius = aobj.pointRadius;
   } else {
     this.pointRadius = 3;
+  }
+  if (aobj.pointType) {
+    this.pointType = aobj.pointType;
+  } else {
+    this.pointType = "closed";
+  }
+  if (aobj.pointOnGraphType) {
+    this.pointOnGraphType = aobj.pointOnGraphType;
+  } else {
+    this.pointOnGraphType = "closed";
   }
   //aobj.minX is the lower bound on the x-axis of the window for the graph
   if (aobj.minX || aobj.minX == 0) {
@@ -386,7 +401,7 @@ var Graph = function(aobj) {
       var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 
       svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-      svg.setAttribute('viewBox', "0 0 "+this.imageWidth+" "+this.imageHeight);
+      svg.setAttribute('viewBox', "0 0 " + this.imageWidth + " " + this.imageHeight);
       svg.setAttribute('width', this.imageWidth);
       svg.setAttribute('height', this.imageHeight);
       var axisSym = document.createElementNS('http://www.w3.org/2000/svg', 'symbol');
@@ -401,7 +416,7 @@ var Graph = function(aobj) {
       use.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', '#' + this.id + 'GraphContents');
       var graphsym = document.createElementNS('http://www.w3.org/2000/svg', 'symbol');
       graphsym.setAttribute('id', this.id + 'GraphContents');
-      graphsym.setAttribute('viewBox', "0 0 "+this.imageWidth+" "+this.imageHeight);
+      graphsym.setAttribute('viewBox', "0 0 " + this.imageWidth + " " + this.imageHeight);
       graphsym.setAttribute('width', '100%');
       graphsym.setAttribute('height', '100%');
       graphG.appendChild(use);
@@ -570,7 +585,8 @@ var Graph = function(aobj) {
             }
 
             betaVal = beta(degreesOfFreedom / 2, degreesOfFreedom2 / 2);
-            this.equationToEval.push('(sqrt((((ax)^(a))*(b^b))/((ax+b)^(a+b))))/(x*' + betaVal + ')');
+            //this.equationToEval.push('(sqrt((((ax)^(a))*(b^b))/((ax+b)^(a+b))))/(x*' + betaVal + ')');
+            this.equationToEval.push('(((a/b)^(a/2))*(x^((a/2)-1))*((1+((a/b)*x))^((-a-b)/2)))/' + betaVal);
             this.equationToEval[i] = this.equationToEval[i].replace(new RegExp("a", 'g'), "(" + degreesOfFreedom + ")");
             this.equationToEval[i] = this.equationToEval[i].replace(new RegExp("b", 'g'), "(" + degreesOfFreedom2 + ")");
           } else if (this.equation[i].toLowerCase() == "studentt") {
@@ -615,7 +631,7 @@ var Graph = function(aobj) {
           degreesOfFreedom2 = parseFloat(this.degreesOfFreedom2);
 
           betaVal = beta(degreesOfFreedom / 2, degreesOfFreedom2 / 2);
-          this.equationToEval = '(sqrt((((ax)^(a))*(b^b))/((ax+b)^(a+b))))/(x*' + betaVal + ')';
+          this.equationToEval = '(((a/b)^(a/2))*(x^((a/2)-1))*((1+((a/b)*x))^((-a-b)/2)))/' + betaVal;
           this.equationToEval = this.equationToEval.replace(new RegExp("a", 'g'), "(" + degreesOfFreedom + ")");
           this.equationToEval = this.equationToEval.replace(new RegExp("b", 'g'), "(" + degreesOfFreedom2 + ")");
         } else if (this.equation.toLowerCase() == "studentt") {
@@ -643,6 +659,7 @@ var Graph = function(aobj) {
     } else {
       var clearAxis = document.getElementById(this.id + 'GraphContents');
       var clearPoint = document.getElementById('pointsContainer' + this.id);
+      var clearGraphPoint = document.getElementById('pointsOnGraphContainer'+this.id);
       if (clearAxis) {
         while (clearAxis.firstChild) {
           clearAxis.removeChild(clearAxis.firstChild);
@@ -652,6 +669,11 @@ var Graph = function(aobj) {
       if (clearPoint) {
         while (clearPoint.firstChild) {
           clearPoint.removeChild(clearPoint.firstChild);
+        }
+      }
+      if (clearGraphPoint) {
+        while (clearGraphPoint.firstChild) {
+          clearGraphPoint.removeChild(clearGraphPoint.firstChild);
         }
       }
     }
@@ -941,7 +963,20 @@ var Graph = function(aobj) {
                 image5.setAttribute('r', gr.pointRadius);
                 image5.setAttribute('stroke-width', '2');
                 image5.setAttribute('stroke', 'red');
-                image5.setAttribute('fill', 'red');
+                if(Array.isArray(gr.pointType)){
+                  if(gr.pointType[i] == 'open'){
+                    image5.setAttribute('fill','white');
+                  } else {
+                    image5.setAttribute('fill', 'red');
+                  }
+                } else {
+                  if(gr.pointType == 'open'){
+                    image5.setAttribute('fill','white');
+                  } else {
+                    image5.setAttribute('fill', 'red');
+                  }
+                }
+                
                 titleImage5 = document.createElementNS('http://www.w3.org/2000/svg', 'title');
                 var textNode = document.createTextNode(e.data.plabels[i]);
                 titleImage5.appendChild(textNode);
@@ -964,6 +999,63 @@ var Graph = function(aobj) {
                       image6 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                       image6.setAttribute('x', parseFloat(e.data.pcx[i]) + parseFloat(gr.pointRadius) + 5);
                       image6.setAttribute('y', parseFloat(e.data.pcy[i]) + parseFloat(gr.pointRadius));
+                      image6.appendChild(textNode2);
+                      pointsContainer.appendChild(image6);
+                    }
+                  }
+                }
+              }
+
+            }
+            graphContent.parentNode.appendChild(pointsContainer);
+          }
+          if (e.data.pcgx) {
+            pointsContainer = image5 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            pointsContainer.setAttribute('id', 'pointsOnGraphContainer' + gr.id)
+            for (var i = 0; i < e.data.pcgx.length; i++) {
+              if (e.data.pcgx[i] && e.data.pcgy[i] && e.data.pglabels[i]) {
+                image5 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                image5.setAttribute('cx', e.data.pcgx[i]);
+                image5.setAttribute('cy', e.data.pcgy[i]);
+                image5.setAttribute('r', gr.pointRadius);
+                image5.setAttribute('stroke-width', '2');
+                image5.setAttribute('stroke', 'red');
+                if(Array.isArray(gr.pointOnGraphType)){
+                  if(gr.pointOnGraphType[i] == 'open'){
+                    image5.setAttribute('fill','white');
+                  } else {
+                    image5.setAttribute('fill', 'red');
+                  }
+                } else {
+                  if(gr.pointOnGraphType == 'open'){
+                    image5.setAttribute('fill','white');
+                  } else {
+                    image5.setAttribute('fill', 'red');
+                  }
+                }
+                
+                titleImage5 = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+                var textNode = document.createTextNode(e.data.pglabels[i]);
+                titleImage5.appendChild(textNode);
+                image5.appendChild(titleImage5);
+                pointsContainer.appendChild(image5);
+
+                if (gr.labelPointsOnGraph) {
+                  if (Array.isArray(gr.labelPointsOnGraph)) {
+                    if (gr.labelPointsOnGraph[i]) {
+                      var textNode2 = document.createTextNode(e.data.pglabels[i]);
+                      image6 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                      image6.setAttribute('x', parseFloat(e.data.pcgx[i]) + parseFloat(gr.pointRadius) + 5);
+                      image6.setAttribute('y', parseFloat(e.data.pcgy[i]) + parseFloat(gr.pointRadius));
+                      image6.appendChild(textNode2);
+                      pointsContainer.appendChild(image6);
+                    }
+                  } else {
+                    if (gr.labelPointsOnGraph) {
+                      var textNode2 = document.createTextNode(e.data.pglabels[i]);
+                      image6 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                      image6.setAttribute('x', parseFloat(e.data.pcgx[i]) + parseFloat(gr.pointRadius) + 5);
+                      image6.setAttribute('y', parseFloat(e.data.pcgy[i]) + parseFloat(gr.pointRadius));
                       image6.appendChild(textNode2);
                       pointsContainer.appendChild(image6);
                     }
@@ -1018,7 +1110,19 @@ var Graph = function(aobj) {
                 //ctx.moveTo(e.data.pcx[i], e.data.pcy[i]);
                 ctx.beginPath();
                 ctx.strokeStyle = "red";
-                ctx.fillStyle = "red";
+                if(Array.isArray(gr.pointType)){
+                  if(gr.pointType[i] == 'open'){
+                    ctx.fillStyle = "white";
+                  } else {
+                    ctx.fillStyle = "red";
+                  }
+                } else {
+                  if(gr.pointType == 'open'){
+                    ctx.fillStyle = "white";
+                  } else {
+                    ctx.fillStyle = "red";
+                  }
+                }
                 ctx.arc(e.data.pcx[i], e.data.pcy[i], gr.pointRadius, 0, 2 * Math.PI);
                 ctx.stroke();
                 ctx.fill();
@@ -1038,6 +1142,54 @@ var Graph = function(aobj) {
                       ctx.strokeStyle = "black";
                       ctx.fillStyle = "black";
                       ctx.fillText(e.data.plabels[i], parseFloat(e.data.pcx[i]) - parseFloat(gr.pointRadius) - 5, parseFloat(e.data.pcy[i]) + parseFloat(gr.pointRadius));
+                    }
+                  }
+                }
+
+              }
+
+            }
+
+          }
+          if (e.data.pcgx) {
+            for (var i = 0; i < e.data.pcgx.length; i++) {
+
+              if (e.data.pcgx[i] && e.data.pcgy[i] && e.data.pglabels[i]) {
+                //ctx.moveTo(e.data.pcgx[i], e.data.pcgy[i]);
+                ctx.beginPath();
+                ctx.strokeStyle = "red";
+                if(Array.isArray(gr.pointOnGraphType)){
+                  if(gr.pointOnGraphType[i] == 'open'){
+                    ctx.fillStyle = "white";
+                  } else {
+                    ctx.fillStyle = "red";
+                  }
+                } else {
+                  if(gr.pointOnGraphType == 'open'){
+                    ctx.fillStyle = "white";
+                  } else {
+                    ctx.fillStyle = "red";
+                  }
+                }
+                ctx.arc(e.data.pcgx[i], e.data.pcgy[i], gr.pointRadius, 0, 2 * Math.PI);
+                ctx.stroke();
+                ctx.fill();
+                if (gr.labelPointsOnGraph) {
+                  if (Array.isArray(gr.labelPointsOnGraph)) {
+                    if (gr.labelPointsOnGraph[i]) {
+                      ctx.beginPath();
+                      ctx.font = '10pt Arial';
+                      ctx.strokeStyle = "black";
+                      ctx.fillStyle = "black";
+                      ctx.fillText(e.data.pglabels[i], parseFloat(e.data.pcgx[i]) - parseFloat(gr.pointRadius) - 5, parseFloat(e.data.pcgy[i]) + parseFloat(gr.pointRadius));
+                    }
+                  } else {
+                    if (gr.labelPointsOnGraph) {
+                      ctx.beginPath();
+                      ctx.font = '10pt Arial';
+                      ctx.strokeStyle = "black";
+                      ctx.fillStyle = "black";
+                      ctx.fillText(e.data.pglabels[i], parseFloat(e.data.pcgx[i]) - parseFloat(gr.pointRadius) - 5, parseFloat(e.data.pcgy[i]) + parseFloat(gr.pointRadius));
                     }
                   }
                 }
@@ -1119,8 +1271,8 @@ var Graph = function(aobj) {
                 }
               }
             }
-
-            finalValue = gr.evaluateEquation(toDisplaySum.replace("=", ""));
+            
+            finalValue = eval(toDisplaySum.replace("=", ""));
 
             MathJax.Hub.Queue(function() {
 
@@ -1141,7 +1293,15 @@ var Graph = function(aobj) {
           }
         }
         if (e.data.areaUnderCurve) {
-          $('#' + gr.id + 'Sum').empty().append(e.data.areaUnderCurve);
+          var sumToShow = 0;
+          if (Array.isArray(e.data.areaUnderCurve)) {
+            for (var i = 0; i < e.data.areaUnderCurve.length; i++) {
+              sumToShow += parseFloat(e.data.areaUnderCurve[i]);
+            }
+          } else {
+            sumToShow = parseFloat(e.data.areaUnderCurve);
+          }
+          $('#' + gr.id + 'Sum').empty().append(sumToShow.toFixed(6).replace(/\.?0+$/, ""));
         }
         sumWork.terminate();
         $('#popup').toggleClass("none");
@@ -1158,9 +1318,9 @@ var Graph = function(aobj) {
 
 
   this.evaluateEquation = function(x) {
-    var a = math.eval(((this.equation).replace(new RegExp("x", 'g'), "(" + x + ")")));
+    var a = math.eval(((this.equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")));
     if (!isNaN(a)) {
-      return parseFloat(parseFloat(math.eval(((this.equation).replace(new RegExp("x", 'g'), "(" + x + ")")))).toFixed(3));
+      return parseFloat(parseFloat(math.eval(((this.equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")))).toFixed(3));
     } else {
       return NaN
     }
