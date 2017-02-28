@@ -1,26 +1,26 @@
 self.addEventListener('message', function(e) {
 
-  importScripts('https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.7.0/math.js');
-  math.pow = function(a, b) {
-    try {
-      var bb = math.fraction(b);
-      //console.log(bb.d);
-      if (a < 0 && bb.d % 2 == 1 && bb.d != 1) {
-        return -1 * Math.pow(-1 * a, b);
-      } else {
-        return Math.pow(a, b);
-      }
-    } catch (e) {
+  //importScripts('https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.7.0/math.js');
+  // math.pow = function(a, b) {
+  //   try {
+  //     var bb = math.fraction(b);
+  //     //console.log(bb.d);
+  //     if (a < 0 && bb.d % 2 == 1 && bb.d != 1) {
+  //       return -1 * Math.pow(-1 * a, b);
+  //     } else {
+  //       return Math.pow(a, b);
+  //     }
+  //   } catch (e) {
 
-      self.postMessage({ "error": "An error has been encountered while attempting to evaluate the given expression.  We will continue to attempt graphing the function, however the output may not be correct." });
+  //     self.postMessage({ "error": "An error has been encountered while attempting to evaluate the given expression.  We will continue to attempt graphing the function, however the output may not be correct." });
 
-      return Math.pow(a, b);
+  //     return Math.pow(a, b);
 
 
-    } finally {
+  //   } finally {
 
-    }
-  }
+  //   }
+  // }
   var dataToPost = {};
   self.postMessage({ 'msg': 'Calculating Right Sum' });
   var rightSumValue = 0;
@@ -189,7 +189,7 @@ self.addEventListener('message', function(e) {
       dataToPost.Integral = integralValue;
     }
   }
-  if(e.data.type == "areaUnderCurve"){
+  if (e.data.type == "areaUnderCurve") {
     self.postMessage({ 'msg': 'Calculating Integral' });
     if (Array.isArray(a) && Array.isArray(b) && a.length == b.length) {
       dataToPost.areaUnderCurve = [];
@@ -309,12 +309,33 @@ self.addEventListener('message', function(e) {
   self.postMessage(dataToPost);
 });
 var evaluateEquation = function(equationToEval, x) {
-  
-  var a = math.eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")));
+
+  var a = eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")));
   if (!isNaN(a)) {
-    return parseFloat(parseFloat(math.eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")))).toFixed(3));
+    return parseFloat(parseFloat(eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")))).toFixed(3));
   } else {
     return NaN
   }
   //return parseFloat(parseFloat(math.eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")))).toFixed(3));
+}
+var isInt = function(n) {
+  return n === +n && n === (n | 0);
+}
+var pow = function(a, b) {
+  try {
+    var temp2 = 1 / 2 / 2 / 2 / 2 / 2 / 2 / 2 / 2 / 2 / 2;
+    if (isInt(b)) {
+      return Math.pow(a, b);
+    } else if (a < 0 && !isInt(b)) {
+      if (b % temp2 == 0) {
+        return Math.pow(a, b);
+      } else {
+        return -1 * Math.pow(-1 * a, b);
+      }
+    } else {
+      return Math.pow(a, b);
+    }
+  } catch (e) {
+    return Math.pow(a, b);
+  }
 }

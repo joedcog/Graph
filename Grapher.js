@@ -1,12 +1,32 @@
 var Graph = function(aobj) {
   //Functions-----------------------------------------------------------------------------------------------
   //Determine if a number is a float
+
+
   var isFloat = function(n) {
       return n === +n && n !== (n | 0);
     }
     //Determine if a number is an integer
   var isInt = function(n) {
-      return n === +n && n === (n | 0);
+    return n === +n && n === (n | 0);
+  }
+  var pow = function(a, b) {
+      try {
+        var temp2 = 1 / 2 / 2 / 2 / 2 / 2 / 2 / 2 / 2 / 2 / 2;
+        if (isInt(b)) {
+          return Math.pow(a, b);
+        } else if (a < 0 && !isInt(b)) {
+          if (b % temp2 == 0) {
+            return Math.pow(a, b);
+          } else {
+            return -1 * Math.pow(-1 * a, b);
+          }
+        } else {
+          return Math.pow(a, b);
+        }
+      } catch (e) {
+        return Math.pow(a, b);
+      }
     }
     //Simple factorial loop
   var factorial = function(n, step) {
@@ -130,10 +150,10 @@ var Graph = function(aobj) {
     //Perhaps the other evaluate function should be the same and this should be removed
   var evaluateGammaEquation = function(equation, x) {
       x = x.toFixed(6);
-      var a = math.eval(((equation).replace(new RegExp("x", 'g'), "(" + x + ")")));
+      var a = eval(((equation).replace(new RegExp("x", 'g'), "(" + x + ")")));
       if (!isNaN(a)) {
 
-        return parseFloat(parseFloat(math.eval(((equation).replace(new RegExp("x", 'g'), "(" + x + ")")))));
+        return parseFloat(parseFloat(eval(((equation).replace(new RegExp("x", 'g'), "(" + x + ")")))));
       } else {
         return NaN
       }
@@ -456,6 +476,12 @@ var Graph = function(aobj) {
       canvas.setAttribute('height', this.imageHeight);
       figure.appendChild(canvas);
       this.ctx = canvas.getContext("2d");
+      if (this.type == 'integral' || this.type == 'leftsum' || this.type == 'rightsum' || this.type == 'areaUnderCurve') {
+        var figcap = document.createElement('figcaption');
+        figcap.setAttribute('id', this.id + 'Sum');
+        figure.appendChild(figcap);
+      }
+
       document.getElementById(this.id).appendChild(figure);
       if (this.drawAxis) {
         this.canvasDrawGraphAxis();
@@ -604,6 +630,91 @@ var Graph = function(aobj) {
           } else {
             this.equationToEval.push(this.equation[i]);
           }
+          this.equationToEval[i] = this.equationToEval[i].replace(/\s+/g, "");
+          // var counter = 0;
+          // var splits = this.equationToEval[i].split("^");
+          // if (splits.length > 1) {
+          //   var firstPow;
+          //   var secondPow;
+          //   for (var j = 0; j < splits.length; j++) {
+          //     //if left side else right side
+
+          //     if (j % 2 == 0) {
+          //       if (splits[j].charAt(splits[j].length - 1) == ')') {
+          //         for (var k = splits[j].length - 1; k >= 0; k--) {
+          //           if (splits[j].charAt(k) == '(') {
+          //             counter--;
+          //           } else if (splits[j].charAt(k) == ')') {
+          //             counter++;
+          //           }
+          //           if (counter == 0) {
+          //             firstPow = (splits[j].substring(k, splits[j].length));
+          //             break;
+          //           }
+          //         }
+          //       } else {
+          //         firstPow = (splits[j].charAt(splits[j].length - 1));
+          //       }
+          //     } else {
+          //       if (splits[j].charAt(0) == '(') {
+          //         for (var k = 0; k < splits[j].length; k++) {
+          //           if (splits[j].charAt(k) == '(') {
+          //             counter++;
+          //           } else if (splits[j].charAt(k) == ')') {
+          //             counter--;
+          //           }
+          //           if (counter == 0) {
+          //             secondPow = (splits[j].substring(0, k + 1));
+          //             break;
+          //           }
+
+          //         }
+          //       } else {
+          //         secondPow = (splits[j].charAt(0));
+          //       }
+          //     }
+          //     if (j % 2 == 1) {
+          //       var temp;
+          //       temp = firstPow + "^" + secondPow;
+          //       console.log(j);
+          //       console.log(firstPow);
+          //       console.log(secondPow);
+          //       console.log(temp);
+          //       this.equationToEval[i] = this.equationToEval[i].replace(temp, "pow(" + firstPow[j] + "," + secondPow[j] + ")");
+
+          //       //splits = this.equationToEval[i].split("^");
+          //     }
+          //   }
+          //   // var temp;
+          //   // for (var j = 0; j < firstPow.length; j++) {
+
+          //   //   temp = firstPow[j] + "^" + secondPow[j];
+          //   //   console.log(temp);
+          //   //   this.equationToEval[i] = this.equationToEval[i].replace(temp, "pow(" + firstPow[j] + "," + secondPow[j] + ")");
+          //   // }
+          //   // console.log(this.equationToEval[i]);
+          // }
+          this.equationToEval[i] = this.equationToEval[i].replace(/([\d\.]{0,}\d+(?=[a-zA-Z]))/g, "$1*");
+          this.equationToEval[i] = this.equationToEval[i].replace(/(\)(?=\())/g, "$1*");
+          this.equationToEval[i] = this.equationToEval[i].replace(/(\^)/g, "**");
+          this.equationToEval[i] = this.equationToEval[i].replace(/(\)(?=\d))/g, "$1*");
+          this.equationToEval[i] = this.equationToEval[i].replace(/(\)(?=[a-zA-Z]))/g, "$1*");
+          this.equationToEval[i] = this.equationToEval[i].replace(/(\d(?=\())/g, "$1*");
+          this.equationToEval[i] = this.equationToEval[i].replace(/((x)(?=\())/g, "$1*");
+          this.equationToEval[i] = this.equationToEval[i].replace(/(asin)/gi, "Math.asin");
+          this.equationToEval[i] = this.equationToEval[i].replace(/(acos)/gi, "Math.acos");
+          this.equationToEval[i] = this.equationToEval[i].replace(/(atan)/gi, "Math.atan");
+          this.equationToEval[i] = this.equationToEval[i].replace(/(sin)/gi, "Math.sin");
+          this.equationToEval[i] = this.equationToEval[i].replace(/(cos)/gi, "Math.cos");
+          this.equationToEval[i] = this.equationToEval[i].replace(/(tan)/gi, "Math.tan");
+          this.equationToEval[i] = this.equationToEval[i].replace(/(e)/gi, "Math.E");
+          this.equationToEval[i] = this.equationToEval[i].replace(/(pi)/gi, "Math.PI");
+          this.equationToEval[i] = this.equationToEval[i].replace(/(sqrt)/gi, "Math.sqrt");
+          this.equationToEval[i] = this.equationToEval[i].replace(/(ln)/gi, "Math.log");
+          this.equationToEval[i] = this.equationToEval[i].replace(/(log)/gi, "Math.log10");
+          this.equationToEval[i] = this.equationToEval[i].replace(/(abs)/g, "Math.abs");
+
+
         }
       } else {
         if (this.equation.toLowerCase() === "normal") {
@@ -645,6 +756,91 @@ var Graph = function(aobj) {
         } else {
           this.equationToEval = this.equation;
         }
+        this.equationToEval = this.equationToEval.replace(/\s+/g, "");
+        // var counter = 0;
+        // var splits = this.equationToEval.split("^");
+        // if (splits.length > 1) {
+        //   var firstPow;
+        //   var secondPow;
+        //   for (var j = 0; j < splits.length; j++) {
+        //     //if left side else right side
+
+        //     if (j % 2 == 0) {
+        //       if (splits[j].charAt(splits[j].length - 1) == ')') {
+        //         for (var k = splits[j].length - 1; k >= 0; k--) {
+        //           if (splits[j].charAt(k) == '(') {
+        //             counter--;
+        //           } else if (splits[j].charAt(k) == ')') {
+        //             counter++;
+        //           }
+        //           if (counter == 0) {
+        //             firstPow = (splits[j].substring(k, splits[j].length));
+        //             break;
+        //           }
+        //         }
+        //       } else {
+        //         firstPow = (splits[j].charAt(splits[j].length - 1));
+        //       }
+        //     } else {
+        //       if (splits[j].charAt(0) == '(') {
+        //         for (var k = 0; k < splits[j].length; k++) {
+        //           if (splits[j].charAt(k) == '(') {
+        //             counter++;
+        //           } else if (splits[j].charAt(k) == ')') {
+        //             counter--;
+        //           }
+        //           if (counter == 0) {
+        //             secondPow = (splits[j].substring(0, k + 1));
+        //             break;
+        //           }
+
+        //         }
+        //       } else {
+        //         secondPow = (splits[j].charAt(0));
+        //       }
+        //     }
+        //     if (j % 2 == 1) {
+        //       var temp;
+        //       temp = firstPow + "^" + secondPow;
+        //       console.log(j);
+        //       console.log(firstPow);
+        //       console.log(secondPow);
+        //       console.log(temp);
+        //       this.equationToEval = this.equationToEval.replace(temp, "pow(" + firstPow[j] + "," + secondPow[j] + ")");
+
+        //       //splits = this.equationToEval.split("^");
+        //     }
+        //   }
+        //   // var temp;
+        //   // for (var j = 0; j < firstPow.length; j++) {
+
+        //   //   temp = firstPow[j] + "^" + secondPow[j];
+        //   //   console.log(temp);
+        //   //   this.equationToEval = this.equationToEval.replace(temp, "pow(" + firstPow[j] + "," + secondPow[j] + ")");
+        //   // }
+        //   // console.log(this.equationToEval);
+        // }
+        this.equationToEval = this.equationToEval.replace(/([\d\.]{0,}\d+(?=[a-zA-Z]))/g, "$1*");
+        this.equationToEval = this.equationToEval.replace(/(\)(?=\())/g, "$1*");
+        this.equationToEval = this.equationToEval.replace(/(\^)/g, "**");
+        this.equationToEval = this.equationToEval.replace(/(\)(?=[a-zA-Z]))/g, "$1*");
+        this.equationToEval = this.equationToEval.replace(/(\)(?=\d))/g, "$1*");
+        this.equationToEval = this.equationToEval.replace(/(\d(?=\())/g, "$1*");
+        this.equationToEval = this.equationToEval.replace(/((x)(?=\())/g, "$1*");
+        this.equationToEval = this.equationToEval.replace(/(asin)/gi, "Math.asin");
+        this.equationToEval = this.equationToEval.replace(/(acos)/gi, "Math.acos");
+        this.equationToEval = this.equationToEval.replace(/(atan)/gi, "Math.atan");
+        this.equationToEval = this.equationToEval.replace(/(sin)/gi, "Math.sin");
+        this.equationToEval = this.equationToEval.replace(/(cos)/gi, "Math.cos");
+        this.equationToEval = this.equationToEval.replace(/(tan)/gi, "Math.tan");
+        this.equationToEval = this.equationToEval.replace(/(e)/gi, "Math.E");
+        this.equationToEval = this.equationToEval.replace(/(pi)/gi, "Math.PI");
+        this.equationToEval = this.equationToEval.replace(/(sqrt)/gi, "Math.sqrt");
+        this.equationToEval = this.equationToEval.replace(/(ln)/gi, "Math.log");
+        this.equationToEval = this.equationToEval.replace(/(log)/gi, "Math.log10");
+        this.equationToEval = this.equationToEval.replace(/(abs)/g, "Math.abs");
+
+
       }
 
     } else {
@@ -652,6 +848,7 @@ var Graph = function(aobj) {
     }
 
   };
+
   this.clearGraph = function() {
     if (this.render.toLowerCase() != 'svg') {
       this.ctx.clearRect(0, 0, 500, 500);
@@ -659,7 +856,7 @@ var Graph = function(aobj) {
     } else {
       var clearAxis = document.getElementById(this.id + 'GraphContents');
       var clearPoint = document.getElementById('pointsContainer' + this.id);
-      var clearGraphPoint = document.getElementById('pointsOnGraphContainer'+this.id);
+      var clearGraphPoint = document.getElementById('pointsOnGraphContainer' + this.id);
       if (clearAxis) {
         while (clearAxis.firstChild) {
           clearAxis.removeChild(clearAxis.firstChild);
@@ -895,9 +1092,9 @@ var Graph = function(aobj) {
       var worker = new Worker('GraphWorker.js');
       worker.addEventListener('message', function(e) {
         if (e.data.error) {
-          $('#popup #message').empty().append(e.data.error);
+          //$('#popup #message').empty().append(e.data.error);
         } else if (e.data.msg) {
-          $('#popup #stage').empty().append(e.data.msg);
+          //$('#popup #stage').empty().append(e.data.msg);
         } else {
 
           if (e.data.Main) {
@@ -963,20 +1160,20 @@ var Graph = function(aobj) {
                 image5.setAttribute('r', gr.pointRadius);
                 image5.setAttribute('stroke-width', '2');
                 image5.setAttribute('stroke', 'red');
-                if(Array.isArray(gr.pointType)){
-                  if(gr.pointType[i] == 'open'){
-                    image5.setAttribute('fill','white');
+                if (Array.isArray(gr.pointType)) {
+                  if (gr.pointType[i] == 'open') {
+                    image5.setAttribute('fill', 'white');
                   } else {
                     image5.setAttribute('fill', 'red');
                   }
                 } else {
-                  if(gr.pointType == 'open'){
-                    image5.setAttribute('fill','white');
+                  if (gr.pointType == 'open') {
+                    image5.setAttribute('fill', 'white');
                   } else {
                     image5.setAttribute('fill', 'red');
                   }
                 }
-                
+
                 titleImage5 = document.createElementNS('http://www.w3.org/2000/svg', 'title');
                 var textNode = document.createTextNode(e.data.plabels[i]);
                 titleImage5.appendChild(textNode);
@@ -1020,20 +1217,20 @@ var Graph = function(aobj) {
                 image5.setAttribute('r', gr.pointRadius);
                 image5.setAttribute('stroke-width', '2');
                 image5.setAttribute('stroke', 'red');
-                if(Array.isArray(gr.pointOnGraphType)){
-                  if(gr.pointOnGraphType[i] == 'open'){
-                    image5.setAttribute('fill','white');
+                if (Array.isArray(gr.pointOnGraphType)) {
+                  if (gr.pointOnGraphType[i] == 'open') {
+                    image5.setAttribute('fill', 'white');
                   } else {
                     image5.setAttribute('fill', 'red');
                   }
                 } else {
-                  if(gr.pointOnGraphType == 'open'){
-                    image5.setAttribute('fill','white');
+                  if (gr.pointOnGraphType == 'open') {
+                    image5.setAttribute('fill', 'white');
                   } else {
                     image5.setAttribute('fill', 'red');
                   }
                 }
-                
+
                 titleImage5 = document.createElementNS('http://www.w3.org/2000/svg', 'title');
                 var textNode = document.createTextNode(e.data.pglabels[i]);
                 titleImage5.appendChild(textNode);
@@ -1075,9 +1272,9 @@ var Graph = function(aobj) {
       var worker = new Worker('CanvasGraphWorker.js');
       worker.addEventListener('message', function(e) {
         if (e.data.error) {
-          $('#popup #message').empty().append(e.data.error);
+          //$('#popup #message').empty().append(e.data.error);
         } else if (e.data.msg) {
-          $('#popup #stage').empty().append(e.data.msg);
+          //$('#popup #stage').empty().append(e.data.msg);
         } else {
 
           if (e.data.Main) {
@@ -1110,14 +1307,14 @@ var Graph = function(aobj) {
                 //ctx.moveTo(e.data.pcx[i], e.data.pcy[i]);
                 ctx.beginPath();
                 ctx.strokeStyle = "red";
-                if(Array.isArray(gr.pointType)){
-                  if(gr.pointType[i] == 'open'){
+                if (Array.isArray(gr.pointType)) {
+                  if (gr.pointType[i] == 'open') {
                     ctx.fillStyle = "white";
                   } else {
                     ctx.fillStyle = "red";
                   }
                 } else {
-                  if(gr.pointType == 'open'){
+                  if (gr.pointType == 'open') {
                     ctx.fillStyle = "white";
                   } else {
                     ctx.fillStyle = "red";
@@ -1158,14 +1355,14 @@ var Graph = function(aobj) {
                 //ctx.moveTo(e.data.pcgx[i], e.data.pcgy[i]);
                 ctx.beginPath();
                 ctx.strokeStyle = "red";
-                if(Array.isArray(gr.pointOnGraphType)){
-                  if(gr.pointOnGraphType[i] == 'open'){
+                if (Array.isArray(gr.pointOnGraphType)) {
+                  if (gr.pointOnGraphType[i] == 'open') {
                     ctx.fillStyle = "white";
                   } else {
                     ctx.fillStyle = "red";
                   }
                 } else {
-                  if(gr.pointOnGraphType == 'open'){
+                  if (gr.pointOnGraphType == 'open') {
                     ctx.fillStyle = "white";
                   } else {
                     ctx.fillStyle = "red";
@@ -1216,16 +1413,21 @@ var Graph = function(aobj) {
     var sumWork = new Worker("SummationWorker.js");
     sumWork.addEventListener('message', function(e) {
       if (e.data.msg) {
-        $('#popup #stage').empty().append(e.data.msg);
+        //$('#popup #stage').empty().append(e.data.msg);
       } else {
         if (e.data.Right) {
           gr.rightSumValue = e.data.Right;
           MathJax.Hub.Queue(function() {
+            var rSumElem = document.getElementById(gr.id + 'Sum');
+            rSumElem.innerHTML = "";
             if (gr.rightSumValue != "diverges") {
               var rightSum = "<math><mstyle displaystyle='true'><msub><mi>R</mi><mi>n</mi></msub><mo>=</mo><munderover><mo>&#x2211;</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mn>" + N + "</mi></munderover><mrow><mi>f</mi><mo></mo><mrow><mo>(</mo><msub><mi>x</mi><mi>i</mi></msub><mo>)</mo></mrow><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></mstyle><mo>=</mo>";
-              $('#' + gr.id + 'Sum').empty().append(rightSum + "<mn>" + gr.rightSumValue + "</mn></mrow></math>" + "<br><span>where </span><math><msub><mi>x</mi><mi>i</mi></msub><mo>=</mo><mn>" + a + "</mn><mo>+</mo><mi>i</mi><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></math>");
+
+              rSumElem.innerHTML = (rightSum + "<mn>" + gr.rightSumValue + "</mn></mrow></math>" + "<br><span>where </span><math><msub><mi>x</mi><mi>i</mi></msub><mo>=</mo><mn>" + a + "</mn><mo>+</mo><mi>i</mi><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></math>");
+              //$('#' + gr.id + 'Sum').empty().append(rightSum + "<mn>" + gr.rightSumValue + "</mn></mrow></math>" + "<br><span>where </span><math><msub><mi>x</mi><mi>i</mi></msub><mo>=</mo><mn>" + a + "</mn><mo>+</mo><mi>i</mi><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></math>");
             } else {
-              $('#' + gr.id + 'Sum').empty().append("Right Sum diverges");
+              rSumElem.innerHTML = ("Right Sum diverges");
+              //$('#' + gr.id + 'Sum').empty().append("Right Sum diverges");
             }
           });
           MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
@@ -1233,11 +1435,15 @@ var Graph = function(aobj) {
         if (e.data.Left) {
           gr.leftSumValue = e.data.Left;
           MathJax.Hub.Queue(function() {
+            var lSumElem = document.getElementById(gr.id + 'Sum');
+            lSumElem.innerHTML = "";
             if (gr.leftSumValue != "diverges") {
               var leftSum = "<math><mstyle displaystyle='true'><msub><mi>L</mi><mi>n</mi></msub><mo>=</mo><munderover><mo>&#x2211;</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mn>" + N + "</mn></munderover><mrow><mi>f</mi><mo></mo><mrow><mo>(</mo><msub><mi>x</mi><mrow><mi>i</mi><mo>&#x2212;</mo><mn>1</mn></mrow></msub><mo>)</mo></mrow><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></mstyle><mo>=</mo>";
-              $('#' + gr.id + 'Sum').empty().append(leftSum + "<mn>" + gr.leftSumValue + "</mn></mrow></math>" + "<br><span>where </span><math><msub><mi>x</mi><mi>i</mi></msub><mo>=</mo><mn>" + a + "</mn><mo>+</mo><mi>i</mi><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></math>");
+              lSumElem.innerHTML = (leftSum + "<mn>" + gr.leftSumValue + "</mn></mrow></math>" + "<br><span>where </span><math><msub><mi>x</mi><mi>i</mi></msub><mo>=</mo><mn>" + a + "</mn><mo>+</mo><mi>i</mi><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></math>");
+              //$('#' + gr.id + 'Sum').empty().append(leftSum + "<mn>" + gr.leftSumValue + "</mn></mrow></math>" + "<br><span>where </span><math><msub><mi>x</mi><mi>i</mi></msub><mo>=</mo><mn>" + a + "</mn><mo>+</mo><mi>i</mi><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></math>");
             } else {
-              $('#' + gr.id + 'Sum').empty().append("Left Sum diverges");
+              lSumElem.innerHTML = ("Left Sum diverges");
+              //$('#' + gr.id + 'Sum').empty().append("Left Sum diverges");
             }
           });
           MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
@@ -1250,9 +1456,11 @@ var Graph = function(aobj) {
             var finalValue;
             for (var i = 0; i < e.data.Integral.length; i++) {
               if (i == e.data.Integral.length - 1) {
-                toDisplayInt = toDisplayInt + "int_(" + a[i] + ")^(" + b[i] + ")(" + equation + ") dx = ";
+                //toDisplayInt = toDisplayInt + "int_(" + a[i] + ")^(" + b[i] + ")(" + equation + ") dx = ";
+                toDisplayInt = toDisplayInt + "int_(" + a[i] + ")^(" + b[i] + ")(" + 'f(x)' + ") dx = ";  
               } else {
-                toDisplayInt = toDisplayInt + "int_(" + a[i] + ")^(" + b[i] + ")(" + equation + ") dx + ";
+                //toDisplayInt = toDisplayInt + "int_(" + a[i] + ")^(" + b[i] + ")(" + equation + ") dx + ";
+                toDisplayInt = toDisplayInt + "int_(" + a[i] + ")^(" + b[i] + ")(" + 'f(x)' + ") dx + ";
               }
             }
             for (var i = 0; i < e.data.Integral.length; i++) {
@@ -1271,22 +1479,31 @@ var Graph = function(aobj) {
                 }
               }
             }
-            
+
             finalValue = eval(toDisplaySum.replace("=", ""));
 
             MathJax.Hub.Queue(function() {
-
-              $('#' + gr.id + 'Sum').empty().append(toDisplayInt + toDisplaySum + finalValue + "`");
+              var iSumElem = document.getElementById(gr.id + 'Sum');
+              iSumElem.innerHTML = "";
+              iSumElem.innerHTML = (toDisplayInt + toDisplaySum + finalValue + "`");
+              //$('#' + gr.id + 'Sum').empty().append(toDisplayInt + toDisplaySum + finalValue + "`");
 
             });
             MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
           } else {
             gr.integralValue = e.data.Integral;
             MathJax.Hub.Queue(function() {
+              var iSumElem = document.getElementById(gr.id + 'Sum');
+              iSumElem.innerHTML = "";
+
               if (gr.integralValue != "diverges" && !isNaN(gr.integralValue)) {
-                $('#' + gr.id + 'Sum').empty().append("`int_(" + a + ")^(" + b + ")" + equation + " dx = " + gr.integralValue + "`");
+                //iSumElem.innerHTML = ("`int_(" + a + ")^(" + b + ")" + equation + " dx = " + gr.integralValue + "`");
+                iSumElem.innerHTML = ("`int_(" + a + ")^(" + b + ")" + 'f(x)' + " dx = " + gr.integralValue + "`");
+                //$('#' + gr.id + 'Sum').empty().append("`int_(" + a + ")^(" + b + ")" + equation + " dx = " + gr.integralValue + "`");
               } else {
-                $('#' + gr.id + 'Sum').empty().append("`int_(" + a + ")^(" + b + ")" + equation + " dx `" + " " + gr.integralValue);
+                //iSumElem.innerHTML = ("`int_(" + a + ")^(" + b + ")" + equation + " dx `" + " " + gr.integralValue);
+                iSumElem.innerHTML = ("`int_(" + a + ")^(" + b + ")" + 'f(x)' + " dx `" + " " + gr.integralValue);
+                //$('#' + gr.id + 'Sum').empty().append("`int_(" + a + ")^(" + b + ")" + equation + " dx `" + " " + gr.integralValue);
               }
             });
             MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
@@ -1301,10 +1518,13 @@ var Graph = function(aobj) {
           } else {
             sumToShow = parseFloat(e.data.areaUnderCurve);
           }
-          $('#' + gr.id + 'Sum').empty().append(sumToShow.toFixed(6).replace(/\.?0+$/, ""));
+          var iSumElem = document.getElementById(gr.id + 'Sum');
+          iSumElem.innerHTML = "";
+          iSumElem.innerHTML = (sumToShow.toFixed(6).replace(/\.?0+$/, ""));
+          //$('#' + gr.id + 'Sum').empty().append(sumToShow.toFixed(6).replace(/\.?0+$/, ""));
         }
         sumWork.terminate();
-        $('#popup').toggleClass("none");
+        //$('#popup').toggleClass("none");
       }
     });
     sumWork.postMessage({ 'type': gr.type, 'equationToEval': equation, 'tinyX': gr.minX, 'largeX': gr.maxX, 'tinyY': gr.minY, 'largeY': gr.maxY, 'N': gr.N, 'a': gr.a, 'b': gr.b });
@@ -1318,9 +1538,9 @@ var Graph = function(aobj) {
 
 
   this.evaluateEquation = function(x) {
-    var a = math.eval(((this.equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")));
+    var a = eval(((this.equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")));
     if (!isNaN(a)) {
-      return parseFloat(parseFloat(math.eval(((this.equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")))).toFixed(3));
+      return parseFloat(parseFloat(eval(((this.equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")))).toFixed(3));
     } else {
       return NaN
     }

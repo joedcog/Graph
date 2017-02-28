@@ -1,24 +1,24 @@
 self.addEventListener('message', function(e) {
-  importScripts('https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.7.0/math.js');
-  math.pow = function(a, b) {
-    try {
-      var bb = math.fraction(b);
-      if (a < 0 && bb.d % 2 == 1 && bb.d != 1) {
-        return -1 * Math.pow(-1 * a, b);
-      } else {
-        return Math.pow(a, b);
-      }
-    } catch (e) {
+  //importScripts('https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.7.0/math.js');
+  // math.pow = function(a, b) {
+  //   try {
+  //     var bb = math.fraction(b);
+  //     if (a < 0 && bb.d % 2 == 1 && bb.d != 1) {
+  //       return -1 * Math.pow(-1 * a, b);
+  //     } else {
+  //       return Math.pow(a, b);
+  //     }
+  //   } catch (e) {
 
-      self.postMessage({ "error": "An error has been encountered while attempting to evaluate the given expression.  We will continue to attempt graphing the function, however the output may not be correct." });
+  //     self.postMessage({ "error": "An error has been encountered while attempting to evaluate the given expression.  We will continue to attempt graphing the function, however the output may not be correct." });
 
-      return Math.pow(a, b);
+  //     return Math.pow(a, b);
 
 
-    } finally {
+  //   } finally {
 
-    }
-  }
+  //   }
+  // }
 
   var imageWidth = e.data.imageWidth;
   var imageHeight = e.data.imageHeight;
@@ -92,9 +92,9 @@ self.addEventListener('message', function(e) {
             //neg inf
           }
         } else if (yVal > parseFloat(largeY) && prevY < parseFloat(tinyY)) { //handle extremely fast changes that would not be graphed
-        
+
         } else if (yVal < parseFloat(tinyY) && prevY > parseFloat(largeY)) { //handle extremely fast changes that would not be graphed
-        
+
         } else if (yVal > parseFloat(largeY) && path != "") {
           if (prevY < parseFloat(largeY)) { //only draw if previous value was on graph and current value goes off graph
 
@@ -125,7 +125,7 @@ self.addEventListener('message', function(e) {
       }
 
       xVal++;
-      
+
     }
     path = path + "ctx.stroke(); ";
     dataToPass.Main = path;
@@ -330,11 +330,32 @@ self.addEventListener('message', function(e) {
 
 var evaluateEquation = function(equationToEval, x) {
 
-  var a = math.eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")));
+  var a = eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")));
   if (!isNaN(a)) {
-    return parseFloat(parseFloat(math.eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")))).toFixed(3));
+    return parseFloat(parseFloat(eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")))).toFixed(3));
   } else {
     return NaN
   }
   //return parseFloat(parseFloat(math.eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")))).toFixed(3));
+}
+var isInt = function(n) {
+  return n === +n && n === (n | 0);
+}
+var pow = function(a, b) {
+  try {
+    var temp2 = 1 / 2 / 2 / 2 / 2 / 2 / 2 / 2 / 2 / 2 / 2;
+    if (isInt(b)) {
+      return Math.pow(a, b);
+    } else if (a < 0 && !isInt(b)) {
+      if (b % temp2 == 0) {
+        return Math.pow(a, b);
+      } else {
+        return -1 * Math.pow(-1 * a, b);
+      }
+    } else {
+      return Math.pow(a, b);
+    }
+  } catch (e) {
+    return Math.pow(a, b);
+  }
 }
