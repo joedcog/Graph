@@ -192,6 +192,26 @@ var Graph = function(aobj) {
       this.equation = '';
     }
   }
+  if (aobj.graphClass) {
+    this.graphClass = aobj.graphClass;
+  } else {
+    this.graphClass = false;
+  }
+  if (aobj.graphColor) {
+    this.graphColor = aobj.graphColor;
+  } else {
+    this.graphColor = "#199C61";
+  }
+  if (aobj.rectColor) {
+    this.rectColor = aobj.rectColor;
+  } else {
+    this.rectColor = "#AA0202";
+  }
+  if (aobj.shadeColor) {
+    this.shadeColor = aobj.shadeColor;
+  } else {
+    this.shadeColor = "#ADD5C3";
+  }
   if (aobj.stdev) {
     this.stdev = aobj.stdev;
   } else {
@@ -631,72 +651,58 @@ var Graph = function(aobj) {
             this.equationToEval.push(this.equation[i]);
           }
           this.equationToEval[i] = this.equationToEval[i].replace(/\s+/g, "");
-          // var counter = 0;
-          // var splits = this.equationToEval[i].split("^");
-          // if (splits.length > 1) {
-          //   var firstPow;
-          //   var secondPow;
-          //   for (var j = 0; j < splits.length; j++) {
-          //     //if left side else right side
+          var counter = 0;
+          var splits = this.equationToEval[i].split(/\^(.+)/);
 
-          //     if (j % 2 == 0) {
-          //       if (splits[j].charAt(splits[j].length - 1) == ')') {
-          //         for (var k = splits[j].length - 1; k >= 0; k--) {
-          //           if (splits[j].charAt(k) == '(') {
-          //             counter--;
-          //           } else if (splits[j].charAt(k) == ')') {
-          //             counter++;
-          //           }
-          //           if (counter == 0) {
-          //             firstPow = (splits[j].substring(k, splits[j].length));
-          //             break;
-          //           }
-          //         }
-          //       } else {
-          //         firstPow = (splits[j].charAt(splits[j].length - 1));
-          //       }
-          //     } else {
-          //       if (splits[j].charAt(0) == '(') {
-          //         for (var k = 0; k < splits[j].length; k++) {
-          //           if (splits[j].charAt(k) == '(') {
-          //             counter++;
-          //           } else if (splits[j].charAt(k) == ')') {
-          //             counter--;
-          //           }
-          //           if (counter == 0) {
-          //             secondPow = (splits[j].substring(0, k + 1));
-          //             break;
-          //           }
+          var firstPow;
+          var secondPow;
+          while (splits.length > 1) {
 
-          //         }
-          //       } else {
-          //         secondPow = (splits[j].charAt(0));
-          //       }
-          //     }
-          //     if (j % 2 == 1) {
-          //       var temp;
-          //       temp = firstPow + "^" + secondPow;
-          //       console.log(j);
-          //       console.log(firstPow);
-          //       console.log(secondPow);
-          //       console.log(temp);
-          //       this.equationToEval[i] = this.equationToEval[i].replace(temp, "pow(" + firstPow[j] + "," + secondPow[j] + ")");
+            if (splits[0].charAt(splits[0].length - 1) == ')') {
+              for (var k = splits[0].length - 1; k >= 0; k--) {
+                if (splits[0].charAt(k) == '(') {
+                  counter--;
+                } else if (splits[0].charAt(k) == ')') {
+                  counter++;
+                }
+                if (counter == 0) {
+                  firstPow = (splits[0].substring(k, splits[0].length));
+                  break;
+                }
+              }
+            } else {
+              firstPow = (splits[0].charAt(splits[0].length - 1));
+            }
 
-          //       //splits = this.equationToEval[i].split("^");
-          //     }
-          //   }
-          //   // var temp;
-          //   // for (var j = 0; j < firstPow.length; j++) {
+            if (splits[1].charAt(0) == '(') {
+              for (var k = 0; k < splits[1].length; k++) {
+                if (splits[1].charAt(k) == '(') {
+                  counter++;
+                } else if (splits[1].charAt(k) == ')') {
+                  counter--;
+                }
+                if (counter == 0) {
+                  secondPow = (splits[1].substring(0, k + 1));
+                  break;
+                }
 
-          //   //   temp = firstPow[j] + "^" + secondPow[j];
-          //   //   console.log(temp);
-          //   //   this.equationToEval[i] = this.equationToEval[i].replace(temp, "pow(" + firstPow[j] + "," + secondPow[j] + ")");
-          //   // }
-          //   // console.log(this.equationToEval[i]);
-          // }
+              }
+            } else {
+              secondPow = (splits[1].charAt(0));
+            }
+
+            var temp;
+            temp = firstPow + "^" + secondPow;
+
+
+            this.equationToEval[i] = this.equationToEval[i].replace(temp, "pow(" + firstPow + "," + secondPow + ")");
+
+            splits = this.equationToEval[i].split(/\^(.+)/);
+
+          }
           this.equationToEval[i] = this.equationToEval[i].replace(/([\d\.]{0,}\d+(?=[a-zA-Z]))/g, "$1*");
           this.equationToEval[i] = this.equationToEval[i].replace(/(\)(?=\())/g, "$1*");
-          this.equationToEval[i] = this.equationToEval[i].replace(/(\^)/g, "**");
+          //this.equationToEval[i] = this.equationToEval[i].replace(/(\^)/g, "**");
           this.equationToEval[i] = this.equationToEval[i].replace(/(\)(?=\d))/g, "$1*");
           this.equationToEval[i] = this.equationToEval[i].replace(/(\)(?=[a-zA-Z]))/g, "$1*");
           this.equationToEval[i] = this.equationToEval[i].replace(/(\d(?=\())/g, "$1*");
@@ -757,72 +763,57 @@ var Graph = function(aobj) {
           this.equationToEval = this.equation;
         }
         this.equationToEval = this.equationToEval.replace(/\s+/g, "");
-        // var counter = 0;
-        // var splits = this.equationToEval.split("^");
-        // if (splits.length > 1) {
-        //   var firstPow;
-        //   var secondPow;
-        //   for (var j = 0; j < splits.length; j++) {
-        //     //if left side else right side
+        var counter = 0;
+        var splits = this.equationToEval.split(/\^(.+)/);
 
-        //     if (j % 2 == 0) {
-        //       if (splits[j].charAt(splits[j].length - 1) == ')') {
-        //         for (var k = splits[j].length - 1; k >= 0; k--) {
-        //           if (splits[j].charAt(k) == '(') {
-        //             counter--;
-        //           } else if (splits[j].charAt(k) == ')') {
-        //             counter++;
-        //           }
-        //           if (counter == 0) {
-        //             firstPow = (splits[j].substring(k, splits[j].length));
-        //             break;
-        //           }
-        //         }
-        //       } else {
-        //         firstPow = (splits[j].charAt(splits[j].length - 1));
-        //       }
-        //     } else {
-        //       if (splits[j].charAt(0) == '(') {
-        //         for (var k = 0; k < splits[j].length; k++) {
-        //           if (splits[j].charAt(k) == '(') {
-        //             counter++;
-        //           } else if (splits[j].charAt(k) == ')') {
-        //             counter--;
-        //           }
-        //           if (counter == 0) {
-        //             secondPow = (splits[j].substring(0, k + 1));
-        //             break;
-        //           }
+        var firstPow;
+        var secondPow;
+        while (splits.length > 1) {
 
-        //         }
-        //       } else {
-        //         secondPow = (splits[j].charAt(0));
-        //       }
-        //     }
-        //     if (j % 2 == 1) {
-        //       var temp;
-        //       temp = firstPow + "^" + secondPow;
-        //       console.log(j);
-        //       console.log(firstPow);
-        //       console.log(secondPow);
-        //       console.log(temp);
-        //       this.equationToEval = this.equationToEval.replace(temp, "pow(" + firstPow[j] + "," + secondPow[j] + ")");
+          if (splits[0].charAt(splits[0].length - 1) == ')') {
+            for (var k = splits[0].length - 1; k >= 0; k--) {
+              if (splits[0].charAt(k) == '(') {
+                counter--;
+              } else if (splits[0].charAt(k) == ')') {
+                counter++;
+              }
+              if (counter == 0) {
+                firstPow = (splits[0].substring(k, splits[0].length));
+                break;
+              }
+            }
+          } else {
+            firstPow = (splits[0].charAt(splits[0].length - 1));
+          }
 
-        //       //splits = this.equationToEval.split("^");
-        //     }
-        //   }
-        //   // var temp;
-        //   // for (var j = 0; j < firstPow.length; j++) {
+          if (splits[1].charAt(0) == '(') {
+            for (var k = 0; k < splits[1].length; k++) {
+              if (splits[1].charAt(k) == '(') {
+                counter++;
+              } else if (splits[1].charAt(k) == ')') {
+                counter--;
+              }
+              if (counter == 0) {
+                secondPow = (splits[1].substring(0, k + 1));
+                break;
+              }
 
-        //   //   temp = firstPow[j] + "^" + secondPow[j];
-        //   //   console.log(temp);
-        //   //   this.equationToEval = this.equationToEval.replace(temp, "pow(" + firstPow[j] + "," + secondPow[j] + ")");
-        //   // }
-        //   // console.log(this.equationToEval);
-        // }
+            }
+          } else {
+            secondPow = (splits[1].charAt(0));
+          }
+          var temp;
+          temp = firstPow + "^" + secondPow;
+
+          this.equationToEval = this.equationToEval.replace(temp, "pow(" + firstPow + "," + secondPow + ")");
+
+          splits = this.equationToEval.split(/\^(.+)/);
+
+        }
+
         this.equationToEval = this.equationToEval.replace(/([\d\.]{0,}\d+(?=[a-zA-Z]))/g, "$1*");
         this.equationToEval = this.equationToEval.replace(/(\)(?=\())/g, "$1*");
-        this.equationToEval = this.equationToEval.replace(/(\^)/g, "**");
+        //this.equationToEval = this.equationToEval.replace(/(\^)/g, "**");
         this.equationToEval = this.equationToEval.replace(/(\)(?=[a-zA-Z]))/g, "$1*");
         this.equationToEval = this.equationToEval.replace(/(\)(?=\d))/g, "$1*");
         this.equationToEval = this.equationToEval.replace(/(\d(?=\())/g, "$1*");
@@ -1096,45 +1087,15 @@ var Graph = function(aobj) {
         } else if (e.data.msg) {
           //$('#popup #stage').empty().append(e.data.msg);
         } else {
-
-          if (e.data.Main) {
-            var image = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            image.setAttribute('d', e.data.Main);
-            image.setAttribute('stroke-width', '2');
-            image.setAttribute('stroke', 'red');
-            image.setAttribute('fill-opacity', 0);
-            image.setAttribute('vector-effect', 'non-scaling-stroke');
-
-            graphContent.appendChild(image);
-          }
-          if (e.data.rect1) {
-            image2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            image2.setAttribute('d', e.data.rect1);
-            image2.setAttribute('stroke-width', '2');
-            image2.setAttribute('stroke', 'blue');
-            image2.setAttribute('fill-opacity', 0);
-            image2.setAttribute('vector-effect', 'non-scaling-stroke');
-            graphContent.appendChild(image2);
-          }
-          if (e.data.rect2) {
-            image3 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            image3.setAttribute('d', e.data.rect2);
-            image3.setAttribute('stroke-width', '2');
-            image3.setAttribute('stroke', 'Green');
-            image3.setAttribute('fill-opacity', 0);
-            image3.setAttribute('vector-effect', 'non-scaling-stroke');
-
-            graphContent.appendChild(image3);
-          }
           if (e.data.shade) {
             if (Array.isArray(e.data.shade)) {
               for (var i = 0; i < e.data.shade.length; i++) {
                 image4 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                 image4.setAttribute('d', e.data.shade[i]);
                 image4.setAttribute('stroke-width', '2');
-                image4.setAttribute('stroke', 'black');
+                //image4.setAttribute('stroke', 'black');
                 image4.setAttribute('fill-opacity', 0.5);
-                image4.setAttribute('fill', '#999');
+                image4.setAttribute('fill', gr.shadeColor);
                 image4.setAttribute('vector-effect', 'non-scaling-stroke');
                 graphContent.appendChild(image4);
               }
@@ -1142,13 +1103,47 @@ var Graph = function(aobj) {
               image4 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
               image4.setAttribute('d', e.data.shade);
               image4.setAttribute('stroke-width', '2');
-              image4.setAttribute('stroke', 'black');
+              //image4.setAttribute('stroke', 'black');
               image4.setAttribute('fill-opacity', 0.5);
-              image4.setAttribute('fill', '#999');
-              image4.setAttribute('vector-effect', 'non-scaling-stroke');
+              image4.setAttribute('fill', gr.shadeColor);
+              //image4.setAttribute('vector-effect', 'non-scaling-stroke');
               graphContent.appendChild(image4);
             }
           }
+          if (e.data.rect1) {
+            image2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            image2.setAttribute('d', e.data.rect1);
+            image2.setAttribute('stroke-width', '2');
+            image2.setAttribute('stroke', gr.rectColor);
+            image2.setAttribute('fill-opacity', 0);
+            //image2.setAttribute('vector-effect', 'non-scaling-stroke');
+            graphContent.appendChild(image2);
+          }
+          if (e.data.rect2) {
+            image3 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            image3.setAttribute('d', e.data.rect2);
+            image3.setAttribute('stroke-width', '2');
+            image3.setAttribute('stroke', gr.rectColor);
+            image3.setAttribute('fill-opacity', 0);
+            //image3.setAttribute('vector-effect', 'non-scaling-stroke');
+
+            graphContent.appendChild(image3);
+          }
+          if (e.data.Main) {
+            var image = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            image.setAttribute('d', e.data.Main);
+            image.setAttribute('stroke-width', '2');
+            image.setAttribute('stroke', gr.graphColor);
+            image.setAttribute('fill-opacity', 0);
+            if (gr.graphClass) {
+              image.setAttribute('class', gr.graphClass);
+            }
+            //image.setAttribute('vector-effect', 'non-scaling-stroke');
+
+            graphContent.appendChild(image);
+          }
+
+
           if (e.data.pcx) {
             pointsContainer = image5 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
             pointsContainer.setAttribute('id', 'pointsContainer' + gr.id)
@@ -1159,18 +1154,18 @@ var Graph = function(aobj) {
                 image5.setAttribute('cy', e.data.pcy[i]);
                 image5.setAttribute('r', gr.pointRadius);
                 image5.setAttribute('stroke-width', '2');
-                image5.setAttribute('stroke', 'red');
+                image5.setAttribute('stroke', gr.graphColor);
                 if (Array.isArray(gr.pointType)) {
                   if (gr.pointType[i] == 'open') {
                     image5.setAttribute('fill', 'white');
                   } else {
-                    image5.setAttribute('fill', 'red');
+                    image5.setAttribute('fill', gr.graphColor);
                   }
                 } else {
                   if (gr.pointType == 'open') {
                     image5.setAttribute('fill', 'white');
                   } else {
-                    image5.setAttribute('fill', 'red');
+                    image5.setAttribute('fill', gr.graphColor);
                   }
                 }
 
@@ -1216,18 +1211,18 @@ var Graph = function(aobj) {
                 image5.setAttribute('cy', e.data.pcgy[i]);
                 image5.setAttribute('r', gr.pointRadius);
                 image5.setAttribute('stroke-width', '2');
-                image5.setAttribute('stroke', 'red');
+                image5.setAttribute('stroke', gr.graphColor);
                 if (Array.isArray(gr.pointOnGraphType)) {
                   if (gr.pointOnGraphType[i] == 'open') {
                     image5.setAttribute('fill', 'white');
                   } else {
-                    image5.setAttribute('fill', 'red');
+                    image5.setAttribute('fill', gr.graphColor);
                   }
                 } else {
                   if (gr.pointOnGraphType == 'open') {
                     image5.setAttribute('fill', 'white');
                   } else {
-                    image5.setAttribute('fill', 'red');
+                    image5.setAttribute('fill', gr.graphColor);
                   }
                 }
 
@@ -1276,22 +1271,21 @@ var Graph = function(aobj) {
         } else if (e.data.msg) {
           //$('#popup #stage').empty().append(e.data.msg);
         } else {
-
-          if (e.data.Main) {
-            ctx.strokeStyle = "red";
-            eval(e.data.Main);
-          }
           if (e.data.rect1) {
-            ctx.strokeStyle = "blue";
+            ctx.strokeStyle = gr.rectColor;
+            ctx.lineWidth = 2;
             eval(e.data.rect1);
           }
           if (e.data.rect2) {
-            ctx.strokeStyle = "green";
+            ctx.strokeStyle = gr.rectColor;
+            ctx.lineWidth = 2;
             eval(e.data.rect2);
           }
           if (e.data.shade) {
-            ctx.strokeStyle = "black";
-            ctx.fillStyle = "rgba(153, 153, 153, 0.5)";
+            ctx.strokeStyle = "none";
+            ctx.globalAlpha = 0.4;
+            ctx.lineWidth = 1;
+            ctx.fillStyle = gr.shadeColor;
             if (Array.isArray(e.data.shade)) {
               for (var i = 0; i < e.data.shade.length; i++) {
                 eval(e.data.shade[i]);
@@ -1299,25 +1293,34 @@ var Graph = function(aobj) {
             } else {
               eval(e.data.shade);
             }
+            ctx.globalAlpha = 1;
           }
+          if (e.data.Main) {
+            ctx.strokeStyle = gr.graphColor;
+            ctx.lineWidth = 2;
+            eval(e.data.Main);
+          }
+
           if (e.data.pcx) {
             for (var i = 0; i < e.data.pcx.length; i++) {
 
               if (e.data.pcx[i] && e.data.pcy[i] && e.data.plabels[i]) {
                 //ctx.moveTo(e.data.pcx[i], e.data.pcy[i]);
                 ctx.beginPath();
-                ctx.strokeStyle = "red";
+                ctx.strokeStyle = gr.graphColor;
                 if (Array.isArray(gr.pointType)) {
                   if (gr.pointType[i] == 'open') {
                     ctx.fillStyle = "white";
                   } else {
-                    ctx.fillStyle = "red";
+                    console.log(gr.graphColor);
+                    ctx.fillStyle = gr.graphColor;
                   }
                 } else {
                   if (gr.pointType == 'open') {
                     ctx.fillStyle = "white";
                   } else {
-                    ctx.fillStyle = "red";
+                    console.log(gr.graphColor);
+                    ctx.fillStyle = gr.graphColor;
                   }
                 }
                 ctx.arc(e.data.pcx[i], e.data.pcy[i], gr.pointRadius, 0, 2 * Math.PI);
@@ -1354,18 +1357,20 @@ var Graph = function(aobj) {
               if (e.data.pcgx[i] && e.data.pcgy[i] && e.data.pglabels[i]) {
                 //ctx.moveTo(e.data.pcgx[i], e.data.pcgy[i]);
                 ctx.beginPath();
-                ctx.strokeStyle = "red";
+                ctx.strokeStyle = gr.graphColor;
                 if (Array.isArray(gr.pointOnGraphType)) {
                   if (gr.pointOnGraphType[i] == 'open') {
                     ctx.fillStyle = "white";
                   } else {
-                    ctx.fillStyle = "red";
+                    console.log(gr.graphColor);
+                    ctx.fillStyle = gr.graphColor;
                   }
                 } else {
                   if (gr.pointOnGraphType == 'open') {
                     ctx.fillStyle = "white";
                   } else {
-                    ctx.fillStyle = "red";
+                    console.log(gr.graphColor);
+                    ctx.fillStyle = gr.graphColor;
                   }
                 }
                 ctx.arc(e.data.pcgx[i], e.data.pcgy[i], gr.pointRadius, 0, 2 * Math.PI);
@@ -1417,36 +1422,36 @@ var Graph = function(aobj) {
       } else {
         if (e.data.Right) {
           gr.rightSumValue = e.data.Right;
-          MathJax.Hub.Queue(function() {
-            var rSumElem = document.getElementById(gr.id + 'Sum');
-            rSumElem.innerHTML = "";
-            if (gr.rightSumValue != "diverges") {
-              var rightSum = "<math><mstyle displaystyle='true'><msub><mi>R</mi><mi>n</mi></msub><mo>=</mo><munderover><mo>&#x2211;</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mn>" + N + "</mi></munderover><mrow><mi>f</mi><mo></mo><mrow><mo>(</mo><msub><mi>x</mi><mi>i</mi></msub><mo>)</mo></mrow><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></mstyle><mo>=</mo>";
+          //MathJax.Hub.Queue(function() {
+          var rSumElem = document.getElementById(gr.id + 'Sum');
+          rSumElem.innerHTML = "";
+          if (gr.rightSumValue != "diverges") {
+            var rightSum = "<math><mstyle displaystyle='true'><msub><mi>R</mi><mi>n</mi></msub><mo>=</mo><munderover><mo>&#x2211;</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mn>" + N + "</mi></munderover><mrow><mi>f</mi><mo></mo><mrow><mo>(</mo><msub><mi>x</mi><mi>i</mi></msub><mo>)</mo></mrow><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></mstyle><mo>=</mo>";
 
-              rSumElem.innerHTML = (rightSum + "<mn>" + gr.rightSumValue + "</mn></mrow></math>" + "<br><span>where </span><math><msub><mi>x</mi><mi>i</mi></msub><mo>=</mo><mn>" + a + "</mn><mo>+</mo><mi>i</mi><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></math>");
-              //$('#' + gr.id + 'Sum').empty().append(rightSum + "<mn>" + gr.rightSumValue + "</mn></mrow></math>" + "<br><span>where </span><math><msub><mi>x</mi><mi>i</mi></msub><mo>=</mo><mn>" + a + "</mn><mo>+</mo><mi>i</mi><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></math>");
-            } else {
-              rSumElem.innerHTML = ("Right Sum diverges");
-              //$('#' + gr.id + 'Sum').empty().append("Right Sum diverges");
-            }
-          });
-          MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+            rSumElem.innerHTML = (rightSum + "<mn>" + gr.rightSumValue + "</mn></mrow></math>" + "<br><span>where </span><math><msub><mi>x</mi><mi>i</mi></msub><mo>=</mo><mn>" + a + "</mn><mo>+</mo><mi>i</mi><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></math>");
+            //$('#' + gr.id + 'Sum').empty().append(rightSum + "<mn>" + gr.rightSumValue + "</mn></mrow></math>" + "<br><span>where </span><math><msub><mi>x</mi><mi>i</mi></msub><mo>=</mo><mn>" + a + "</mn><mo>+</mo><mi>i</mi><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></math>");
+          } else {
+            rSumElem.innerHTML = ("Right Sum diverges");
+            //$('#' + gr.id + 'Sum').empty().append("Right Sum diverges");
+          }
+          //});
+          //MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
         }
         if (e.data.Left) {
           gr.leftSumValue = e.data.Left;
-          MathJax.Hub.Queue(function() {
-            var lSumElem = document.getElementById(gr.id + 'Sum');
-            lSumElem.innerHTML = "";
-            if (gr.leftSumValue != "diverges") {
-              var leftSum = "<math><mstyle displaystyle='true'><msub><mi>L</mi><mi>n</mi></msub><mo>=</mo><munderover><mo>&#x2211;</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mn>" + N + "</mn></munderover><mrow><mi>f</mi><mo></mo><mrow><mo>(</mo><msub><mi>x</mi><mrow><mi>i</mi><mo>&#x2212;</mo><mn>1</mn></mrow></msub><mo>)</mo></mrow><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></mstyle><mo>=</mo>";
-              lSumElem.innerHTML = (leftSum + "<mn>" + gr.leftSumValue + "</mn></mrow></math>" + "<br><span>where </span><math><msub><mi>x</mi><mi>i</mi></msub><mo>=</mo><mn>" + a + "</mn><mo>+</mo><mi>i</mi><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></math>");
-              //$('#' + gr.id + 'Sum').empty().append(leftSum + "<mn>" + gr.leftSumValue + "</mn></mrow></math>" + "<br><span>where </span><math><msub><mi>x</mi><mi>i</mi></msub><mo>=</mo><mn>" + a + "</mn><mo>+</mo><mi>i</mi><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></math>");
-            } else {
-              lSumElem.innerHTML = ("Left Sum diverges");
-              //$('#' + gr.id + 'Sum').empty().append("Left Sum diverges");
-            }
-          });
-          MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+          //MathJax.Hub.Queue(function() {
+          var lSumElem = document.getElementById(gr.id + 'Sum');
+          lSumElem.innerHTML = "";
+          if (gr.leftSumValue != "diverges") {
+            var leftSum = "<math><mstyle displaystyle='true'><msub><mi>L</mi><mi>n</mi></msub><mo>=</mo><munderover><mo>&#x2211;</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mn>" + N + "</mn></munderover><mrow><mi>f</mi><mo></mo><mrow><mo>(</mo><msub><mi>x</mi><mrow><mi>i</mi><mo>&#x2212;</mo><mn>1</mn></mrow></msub><mo>)</mo></mrow><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></mstyle><mo>=</mo>";
+            lSumElem.innerHTML = (leftSum + "<mn>" + gr.leftSumValue + "</mn></mrow></math>" + "<br><span>where </span><math><msub><mi>x</mi><mi>i</mi></msub><mo>=</mo><mn>" + a + "</mn><mo>+</mo><mi>i</mi><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></math>");
+            //$('#' + gr.id + 'Sum').empty().append(leftSum + "<mn>" + gr.leftSumValue + "</mn></mrow></math>" + "<br><span>where </span><math><msub><mi>x</mi><mi>i</mi></msub><mo>=</mo><mn>" + a + "</mn><mo>+</mo><mi>i</mi><mrow><mo>(</mo><mn>" + (b - a) / N + "</mn><mo>)</mo></mrow></math>");
+          } else {
+            lSumElem.innerHTML = ("Left Sum diverges");
+            //$('#' + gr.id + 'Sum').empty().append("Left Sum diverges");
+          }
+          //});
+          //MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
         }
         if (e.data.Integral) {
           if (Array.isArray(e.data.Integral)) {
@@ -1457,7 +1462,7 @@ var Graph = function(aobj) {
             for (var i = 0; i < e.data.Integral.length; i++) {
               if (i == e.data.Integral.length - 1) {
                 //toDisplayInt = toDisplayInt + "int_(" + a[i] + ")^(" + b[i] + ")(" + equation + ") dx = ";
-                toDisplayInt = toDisplayInt + "int_(" + a[i] + ")^(" + b[i] + ")(" + 'f(x)' + ") dx = ";  
+                toDisplayInt = toDisplayInt + "int_(" + a[i] + ")^(" + b[i] + ")(" + 'f(x)' + ") dx = ";
               } else {
                 //toDisplayInt = toDisplayInt + "int_(" + a[i] + ")^(" + b[i] + ")(" + equation + ") dx + ";
                 toDisplayInt = toDisplayInt + "int_(" + a[i] + ")^(" + b[i] + ")(" + 'f(x)' + ") dx + ";
@@ -1482,31 +1487,31 @@ var Graph = function(aobj) {
 
             finalValue = eval(toDisplaySum.replace("=", ""));
 
-            MathJax.Hub.Queue(function() {
-              var iSumElem = document.getElementById(gr.id + 'Sum');
-              iSumElem.innerHTML = "";
-              iSumElem.innerHTML = (toDisplayInt + toDisplaySum + finalValue + "`");
-              //$('#' + gr.id + 'Sum').empty().append(toDisplayInt + toDisplaySum + finalValue + "`");
+            //MathJax.Hub.Queue(function() {
+            var iSumElem = document.getElementById(gr.id + 'Sum');
+            iSumElem.innerHTML = "";
+            iSumElem.innerHTML = (toDisplayInt + toDisplaySum + finalValue + "`");
+            //$('#' + gr.id + 'Sum').empty().append(toDisplayInt + toDisplaySum + finalValue + "`");
 
-            });
-            MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+            //});
+            //MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
           } else {
             gr.integralValue = e.data.Integral;
-            MathJax.Hub.Queue(function() {
-              var iSumElem = document.getElementById(gr.id + 'Sum');
-              iSumElem.innerHTML = "";
+            //MathJax.Hub.Queue(function() {
+            var iSumElem = document.getElementById(gr.id + 'Sum');
+            iSumElem.innerHTML = "";
 
-              if (gr.integralValue != "diverges" && !isNaN(gr.integralValue)) {
-                //iSumElem.innerHTML = ("`int_(" + a + ")^(" + b + ")" + equation + " dx = " + gr.integralValue + "`");
-                iSumElem.innerHTML = ("`int_(" + a + ")^(" + b + ")" + 'f(x)' + " dx = " + gr.integralValue + "`");
-                //$('#' + gr.id + 'Sum').empty().append("`int_(" + a + ")^(" + b + ")" + equation + " dx = " + gr.integralValue + "`");
-              } else {
-                //iSumElem.innerHTML = ("`int_(" + a + ")^(" + b + ")" + equation + " dx `" + " " + gr.integralValue);
-                iSumElem.innerHTML = ("`int_(" + a + ")^(" + b + ")" + 'f(x)' + " dx `" + " " + gr.integralValue);
-                //$('#' + gr.id + 'Sum').empty().append("`int_(" + a + ")^(" + b + ")" + equation + " dx `" + " " + gr.integralValue);
-              }
-            });
-            MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+            if (gr.integralValue != "diverges" && !isNaN(gr.integralValue)) {
+              //iSumElem.innerHTML = ("`int_(" + a + ")^(" + b + ")" + equation + " dx = " + gr.integralValue + "`");
+              iSumElem.innerHTML = ("`int_(" + a + ")^(" + b + ")" + 'f(x)' + " dx = " + gr.integralValue + "`");
+              //$('#' + gr.id + 'Sum').empty().append("`int_(" + a + ")^(" + b + ")" + equation + " dx = " + gr.integralValue + "`");
+            } else {
+              //iSumElem.innerHTML = ("`int_(" + a + ")^(" + b + ")" + equation + " dx `" + " " + gr.integralValue);
+              iSumElem.innerHTML = ("`int_(" + a + ")^(" + b + ")" + 'f(x)' + " dx `" + " " + gr.integralValue);
+              //$('#' + gr.id + 'Sum').empty().append("`int_(" + a + ")^(" + b + ")" + equation + " dx `" + " " + gr.integralValue);
+            }
+            //});
+            //MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
           }
         }
         if (e.data.areaUnderCurve) {
@@ -1531,8 +1536,8 @@ var Graph = function(aobj) {
   };
 
   this.createEquation = function() {
-    MathJax.Hub.Queue(function() { document.getElementById('equationList').innerHTML = "`f(x)=" + this.equation + "`" });
-    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+    //MathJax.Hub.Queue(function() { document.getElementById('equationList').innerHTML = "`f(x)=" + this.equation + "`" });
+    //MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
 
   };
 
