@@ -1,24 +1,4 @@
 self.addEventListener('message', function(e) {
-  //importScripts('https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.7.0/math.js');
-  // math.pow = function(a, b) {
-  //   try {
-  //     var bb = math.fraction(b);
-  //     if (a < 0 && bb.d % 2 == 1 && bb.d != 1) {
-  //       return -1 * Math.pow(-1 * a, b);
-  //     } else {
-  //       return Math.pow(a, b);
-  //     }
-  //   } catch (e) {
-
-  //     self.postMessage({ "error": "An error has been encountered while attempting to evaluate the given expression.  We will continue to attempt graphing the function, however the output may not be correct." });
-
-  //     return Math.pow(a, b);
-
-
-  //   } finally {
-
-  //   }
-  // }
 
   var imageWidth = e.data.imageWidth;
   var imageHeight = e.data.imageHeight;
@@ -213,9 +193,9 @@ self.addEventListener('message', function(e) {
                 break;
               }
               if (yVal > parseFloat(largeY)) {
-                path += "ctx.lineTo(" + (yAxisPosition + parseFloat((K) * (widthx))) + ", " + (xAxisPosition - parseFloat(largeY * widthy + 30)) + "); ";
+                path += "ctx.lineTo(" + (yAxisPosition + parseFloat((K) * (widthx))) + ", " + (xAxisPosition - parseFloat(largeY * widthy )) + "); ";
               } else {
-                path += "ctx.lineTo(" + (yAxisPosition + parseFloat((K) * (widthx))) + ", " + (xAxisPosition - parseFloat(tinyY * widthy - 30)) + "); ";
+                path += "ctx.lineTo(" + (yAxisPosition + parseFloat((K) * (widthx))) + ", " + (xAxisPosition - parseFloat(tinyY * widthy )) + "); ";
               }
             }
           }
@@ -248,9 +228,9 @@ self.addEventListener('message', function(e) {
               break;
             }
             if (yVal > parseFloat(largeY)) {
-              path += "ctx.lineTo(" + (yAxisPosition + parseFloat((K) * (widthx))) + ", " + (xAxisPosition - parseFloat(largeY * widthy + 30)) + "); ";
+              path += "ctx.lineTo(" + (yAxisPosition + parseFloat((K) * (widthx))) + ", " + (xAxisPosition - parseFloat(largeY * widthy )) + "); ";
             } else {
-              path += "ctx.lineTo(" + (yAxisPosition + parseFloat((K) * (widthx))) + ", " + (xAxisPosition - parseFloat(tinyY * widthy - 30)) + "); ";
+              path += "ctx.lineTo(" + (yAxisPosition + parseFloat((K) * (widthx))) + ", " + (xAxisPosition - parseFloat(tinyY * widthy )) + "); ";
             }
           }
 
@@ -332,7 +312,7 @@ var evaluateEquation = function(equationToEval, x) {
 
   var a = eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")));
   if (!isNaN(a)) {
-    return parseFloat(parseFloat(eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")))).toFixed(3));
+    return parseFloat(parseFloat(eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")))).toFixed(8));
   } else {
     return NaN
   }

@@ -1,30 +1,10 @@
 self.addEventListener('message', function(e) {
 
-  //importScripts('https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.7.0/math.js');
-  // math.pow = function(a, b) {
-  //   try {
-  //     var bb = math.fraction(b);
-  //     //console.log(bb.d);
-  //     if (a < 0 && bb.d % 2 == 1 && bb.d != 1) {
-  //       return -1 * Math.pow(-1 * a, b);
-  //     } else {
-  //       return Math.pow(a, b);
-  //     }
-  //   } catch (e) {
-
-  //     self.postMessage({ "error": "An error has been encountered while attempting to evaluate the given expression.  We will continue to attempt graphing the function, however the output may not be correct." });
-
-  //     return Math.pow(a, b);
-
-
-  //   } finally {
-
-  //   }
-  // }
   var dataToPost = {};
   self.postMessage({ 'msg': 'Calculating Right Sum' });
   var rightSumValue = 0;
   var equationToEval = e.data.equationToEval;
+
   var N = e.data.N;
   var a = e.data.a;
   var b = e.data.b;
@@ -79,7 +59,7 @@ self.addEventListener('message', function(e) {
       for (var l = 0; l < a.length; l++) {
         integralValue = 0;
         var xVal = b[l];
-        var size = 350;
+        var size = 200;
         var tempY = 0;
         var prevYVal = 0;
         for (var i = 0; i < size * (b[l] - a[l]); i++) {
@@ -135,7 +115,7 @@ self.addEventListener('message', function(e) {
     } else {
       integralValue = 0;
       var xVal = b;
-      var size = 350;
+      var size = 200;
       var tempY = 0;
       var prevYVal = 0;
       for (var i = 0; i < size * (b - a); i++) {
@@ -196,7 +176,7 @@ self.addEventListener('message', function(e) {
       for (var l = 0; l < a.length; l++) {
         integralValue = 0;
         var xVal = b[l];
-        var size = 350;
+        var size = 200;
         var tempY = 0;
         var prevYVal = 0;
         for (var i = 0; i < size * (b[l] - a[l]); i++) {
@@ -312,7 +292,7 @@ var evaluateEquation = function(equationToEval, x) {
 
   var a = eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")));
   if (!isNaN(a)) {
-    return parseFloat(parseFloat(eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")))).toFixed(3));
+    return parseFloat(parseFloat(eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")))).toFixed(8));
   } else {
     return NaN
   }

@@ -212,17 +212,17 @@ var Graph = function(aobj) {
   } else {
     this.shadeColor = "#ADD5C3";
   }
-  if (aobj.stdev) {
+  if (aobj.stdev != null) {
     this.stdev = aobj.stdev;
   } else {
     this.stdev = 1;
   }
-  if (aobj.mean) {
+  if (aobj.mean != null) {
     this.mean = aobj.mean;
   } else {
     this.mean = 1;
   }
-  if (aobj.lambda) {
+  if (aobj.lambda != null) {
     this.lambda = aobj.lambda;
   } else {
     this.lambda = 1;
@@ -1515,6 +1515,7 @@ var Graph = function(aobj) {
           }
         }
         if (e.data.areaUnderCurve) {
+          console.log(e.data.areaUnderCurve);
           var sumToShow = 0;
           if (Array.isArray(e.data.areaUnderCurve)) {
             for (var i = 0; i < e.data.areaUnderCurve.length; i++) {
@@ -1523,10 +1524,13 @@ var Graph = function(aobj) {
           } else {
             sumToShow = parseFloat(e.data.areaUnderCurve);
           }
-          var iSumElem = document.getElementById(gr.id + 'Sum');
-          iSumElem.innerHTML = "";
-          iSumElem.innerHTML = (sumToShow.toFixed(6).replace(/\.?0+$/, ""));
-          //$('#' + gr.id + 'Sum').empty().append(sumToShow.toFixed(6).replace(/\.?0+$/, ""));
+          gr.areaUnderCurve = sumToShow.toFixed(6).replace(/\.?0+$/, "");
+          if (document.getElementById(gr.id + 'Sum')) {
+            var iSumElem = document.getElementById(gr.id + 'Sum');
+            iSumElem.innerHTML = "";
+            iSumElem.innerHTML = (sumToShow.toFixed(6).replace(/\.?0+$/, ""));
+            //$('#' + gr.id + 'Sum').empty().append(sumToShow.toFixed(6).replace(/\.?0+$/, ""));
+          }
         }
         sumWork.terminate();
         //$('#popup').toggleClass("none");
