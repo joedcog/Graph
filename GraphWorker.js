@@ -376,7 +376,7 @@ var pow = function(a, b) {
 }
 
 var evaluateEquation = function(equationToEval, x) {
-
+  
   var a = eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")));
   if (!isNaN(a)) {
     return parseFloat(parseFloat(eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")))).toFixed(8));
@@ -384,25 +384,4 @@ var evaluateEquation = function(equationToEval, x) {
     return NaN
   }
   //return parseFloat(parseFloat(math.eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")))).toFixed(3));
-}
-var isInt = function(n) {
-  return n === +n && n === (n | 0);
-}
-var pow = function(a, b) {
-  try {
-    var temp2 = 1 / 2 / 2 / 2 / 2 / 2 / 2 / 2 / 2 / 2 / 2;
-    if (isInt(b)) {
-      return Math.pow(a, b);
-    } else if (a < 0 && !isInt(b)) {
-      if (b % temp2 == 0) {
-        return Math.pow(a, b);
-      } else {
-        return -1 * Math.pow(-1 * a, b);
-      }
-    } else {
-      return Math.pow(a, b);
-    }
-  } catch (e) {
-    return Math.pow(a, b);
-  }
 }

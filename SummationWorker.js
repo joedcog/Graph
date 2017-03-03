@@ -286,18 +286,9 @@ self.addEventListener('message', function(e) {
       dataToPost.areaUnderCurve = integralValue;
     }
   }
+
   self.postMessage(dataToPost);
 });
-var evaluateEquation = function(equationToEval, x) {
-
-  var a = eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")));
-  if (!isNaN(a)) {
-    return parseFloat(parseFloat(eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")))).toFixed(8));
-  } else {
-    return NaN
-  }
-  //return parseFloat(parseFloat(math.eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")))).toFixed(3));
-}
 var isInt = function(n) {
   return n === +n && n === (n | 0);
 }
@@ -319,3 +310,14 @@ var pow = function(a, b) {
     return Math.pow(a, b);
   }
 }
+var evaluateEquation = function(equationToEval, x) {
+
+  var a = eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")));
+  if (!isNaN(a)) {
+    return parseFloat(parseFloat(eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")))).toFixed(8));
+  } else {
+    return NaN
+  }
+  //return parseFloat(parseFloat(math.eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")))).toFixed(3));
+}
+

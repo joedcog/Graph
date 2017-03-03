@@ -1420,7 +1420,7 @@ var Graph = function(aobj) {
       if (e.data.msg) {
         //$('#popup #stage').empty().append(e.data.msg);
       } else {
-        if (e.data.Right) {
+        if (typeof e.data.Right !== "undefined") {
           gr.rightSumValue = e.data.Right;
           //MathJax.Hub.Queue(function() {
           var rSumElem = document.getElementById(gr.id + 'Sum');
@@ -1437,7 +1437,7 @@ var Graph = function(aobj) {
           //});
           //MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
         }
-        if (e.data.Left) {
+        if (typeof e.data.Left !== "undefined") {
           gr.leftSumValue = e.data.Left;
           //MathJax.Hub.Queue(function() {
           var lSumElem = document.getElementById(gr.id + 'Sum');
@@ -1453,7 +1453,7 @@ var Graph = function(aobj) {
           //});
           //MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
         }
-        if (e.data.Integral) {
+        if (typeof e.data.Integral !== "undefined") {
           if (Array.isArray(e.data.Integral)) {
             gr.integralValue = [];
             var toDisplayInt = "`";
@@ -1514,7 +1514,7 @@ var Graph = function(aobj) {
             //MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
           }
         }
-        if (e.data.areaUnderCurve) {
+        if (typeof e.data.areaUnderCurve !== "undefined") {
           console.log(e.data.areaUnderCurve);
           var sumToShow = 0;
           if (Array.isArray(e.data.areaUnderCurve)) {
