@@ -1,3 +1,4 @@
+"use strict";
 self.addEventListener('message', function(e) {
 
   var dataToPost = {};
@@ -9,10 +10,17 @@ self.addEventListener('message', function(e) {
   var a = e.data.a;
   var b = e.data.b;
   var xVal = b;
+  var i = 0;
+  var prevYVal = 0;
+  var integralValue;
+  var tempY = 0;
+  var temporary = 0;
+  var l = 0;
+  var size = 350;
   if (e.data.type == "rightsum") {
     var tempRight = 0;
 
-    for (var i = 0; i < N; i++) {
+    for (i = 0; i < N; i++) {
       tempRight = (evaluateEquation(equationToEval, xVal) * ((b - a) / N));
       rightSumValue += tempRight;
       if (!isFinite(tempRight)) {
@@ -33,9 +41,9 @@ self.addEventListener('message', function(e) {
   if (e.data.type == "leftsum") {
     self.postMessage({ 'msg': 'Calculating Left Sum' });
     var leftSumValue = 0;
-    var xVal = a;
+    xVal = a;
     var tempLeft = 0;
-    for (var i = 0; i < N; i++) {
+    for (i = 0; i < N; i++) {
       tempLeft = (evaluateEquation(equationToEval, xVal) * ((b - a) / N));
       leftSumValue += parseFloat(tempLeft.toFixed(6));
       if (!isFinite(tempLeft)) {
@@ -53,20 +61,21 @@ self.addEventListener('message', function(e) {
     dataToPost.Left = leftSumValue;
   }
   if (e.data.type == "integral") {
+    
     self.postMessage({ 'msg': 'Calculating Integral' });
     if (Array.isArray(a) && Array.isArray(b) && a.length == b.length) {
       dataToPost.Integral = [];
-      for (var l = 0; l < a.length; l++) {
+      for (l = 0; l < a.length; l++) {
         integralValue = 0;
-        var xVal = b[l];
-        var size = 200;
-        var tempY = 0;
-        var prevYVal = 0;
-        for (var i = 0; i < size * (b[l] - a[l]); i++) {
+        xVal = b[l];
+        
+        tempY = 0;
+        prevYVal = 0;
+        for (i = 0; i < size * (b[l] - a[l]); i++) {
           if (xVal - (1 / size) < a[l]) {
-            tempY = ((evaluateEquation(equationToEval, xVal) + evaluateEquation(equationToEval, a[l])) * .5 * (1 / size));
+            tempY = ((evaluateEquation(equationToEval, xVal) + evaluateEquation(equationToEval, a[l])) * 0.5 * (1 / size));
           } else {
-            tempY = ((evaluateEquation(equationToEval, xVal) + evaluateEquation(equationToEval, xVal - (1 / size))) * .5 * (1 / size));
+            tempY = ((evaluateEquation(equationToEval, xVal) + evaluateEquation(equationToEval, xVal - (1 / size))) * 0.5 * (1 / size));
           }
           ////console.log(tempY + ' ' + (xVal-(1/size)));
           // integralValue +   = parseFloat(tempY.toFixed(6));
@@ -98,8 +107,8 @@ self.addEventListener('message', function(e) {
         }
 
         tempY = 0;
-        var prevYVal = 0;
-        var temporary = 0;
+        prevYVal = 0;
+        temporary = 0;
 
         if (integralValue != "diverges" && !isNaN(integralValue)) {
           //integralValue = (integralValue + temporary) / 2;
@@ -114,15 +123,15 @@ self.addEventListener('message', function(e) {
       }
     } else {
       integralValue = 0;
-      var xVal = b;
-      var size = 200;
-      var tempY = 0;
-      var prevYVal = 0;
-      for (var i = 0; i < size * (b - a); i++) {
+      xVal = b;
+      
+      tempY = 0;
+      prevYVal = 0;
+      for (i = 0; i < size * (b - a); i++) {
         if (xVal - (1 / size) < a) {
-          tempY = ((evaluateEquation(equationToEval, xVal) + evaluateEquation(equationToEval, a)) * .5 * (1 / size));
+          tempY = ((evaluateEquation(equationToEval, xVal) + evaluateEquation(equationToEval, a)) * 0.5 * (1 / size));
         } else {
-          tempY = ((evaluateEquation(equationToEval, xVal) + evaluateEquation(equationToEval, xVal - (1 / size))) * .5 * (1 / size));
+          tempY = ((evaluateEquation(equationToEval, xVal) + evaluateEquation(equationToEval, xVal - (1 / size))) * 0.5 * (1 / size));
         }
         ////console.log(tempY + ' ' + (xVal-(1/size)));
         // integralValue +   = parseFloat(tempY.toFixed(6));
@@ -154,8 +163,8 @@ self.addEventListener('message', function(e) {
       }
 
       tempY = 0;
-      var prevYVal = 0;
-      var temporary = 0;
+      prevYVal = 0;
+      temporary = 0;
 
       if (integralValue != "diverges" && !isNaN(integralValue)) {
         //integralValue = (integralValue + temporary) / 2;
@@ -170,20 +179,21 @@ self.addEventListener('message', function(e) {
     }
   }
   if (e.data.type == "areaUnderCurve") {
+    
     self.postMessage({ 'msg': 'Calculating Integral' });
     if (Array.isArray(a) && Array.isArray(b) && a.length == b.length) {
       dataToPost.areaUnderCurve = [];
-      for (var l = 0; l < a.length; l++) {
+      for (l = 0; l < a.length; l++) {
         integralValue = 0;
-        var xVal = b[l];
-        var size = 200;
-        var tempY = 0;
-        var prevYVal = 0;
-        for (var i = 0; i < size * (b[l] - a[l]); i++) {
+        xVal = b[l];
+        
+        tempY = 0;
+        prevYVal = 0;
+        for (i = 0; i < size * (b[l] - a[l]); i++) {
           if (xVal - (1 / size) < a[l]) {
-            tempY = ((evaluateEquation(equationToEval, xVal) + evaluateEquation(equationToEval, a[l])) * .5 * (1 / size));
+            tempY = ((evaluateEquation(equationToEval, xVal) + evaluateEquation(equationToEval, a[l])) * 0.5 * (1 / size));
           } else {
-            tempY = ((evaluateEquation(equationToEval, xVal) + evaluateEquation(equationToEval, xVal - (1 / size))) * .5 * (1 / size));
+            tempY = ((evaluateEquation(equationToEval, xVal) + evaluateEquation(equationToEval, xVal - (1 / size))) * 0.5 * (1 / size));
           }
           ////console.log(tempY + ' ' + (xVal-(1/size)));
           // integralValue +   = parseFloat(tempY.toFixed(6));
@@ -215,8 +225,8 @@ self.addEventListener('message', function(e) {
         }
 
         tempY = 0;
-        var prevYVal = 0;
-        var temporary = 0;
+        prevYVal = 0;
+        temporary = 0;
 
         if (integralValue != "diverges" && !isNaN(integralValue)) {
           //integralValue = (integralValue + temporary) / 2;
@@ -231,15 +241,15 @@ self.addEventListener('message', function(e) {
       }
     } else {
       integralValue = 0;
-      var xVal = b;
-      var size = 350;
-      var tempY = 0;
-      var prevYVal = 0;
-      for (var i = 0; i < size * (b - a); i++) {
+      xVal = b;
+      
+      tempY = 0;
+      prevYVal = 0;
+      for (i = 0; i < size * (b - a); i++) {
         if (xVal - (1 / size) < a) {
-          tempY = ((evaluateEquation(equationToEval, xVal) + evaluateEquation(equationToEval, a)) * .5 * (1 / size));
+          tempY = ((evaluateEquation(equationToEval, xVal) + evaluateEquation(equationToEval, a)) * 0.5 * (1 / size));
         } else {
-          tempY = ((evaluateEquation(equationToEval, xVal) + evaluateEquation(equationToEval, xVal - (1 / size))) * .5 * (1 / size));
+          tempY = ((evaluateEquation(equationToEval, xVal) + evaluateEquation(equationToEval, xVal - (1 / size))) * 0.5 * (1 / size));
         }
         ////console.log(tempY + ' ' + (xVal-(1/size)));
         // integralValue +   = parseFloat(tempY.toFixed(6));
@@ -271,8 +281,8 @@ self.addEventListener('message', function(e) {
       }
 
       tempY = 0;
-      var prevYVal = 0;
-      var temporary = 0;
+      prevYVal = 0;
+      temporary = 0;
 
       if (integralValue != "diverges" && !isNaN(integralValue)) {
         //integralValue = (integralValue + temporary) / 2;
@@ -291,14 +301,14 @@ self.addEventListener('message', function(e) {
 });
 var isInt = function(n) {
   return n === +n && n === (n | 0);
-}
+};
 var pow = function(a, b) {
   try {
     var temp2 = 1 / 2 / 2 / 2 / 2 / 2 / 2 / 2 / 2 / 2 / 2;
     if (isInt(b)) {
       return Math.pow(a, b);
     } else if (a < 0 && !isInt(b)) {
-      if (b % temp2 == 0) {
+      if (b % temp2 === 0) {
         return Math.pow(a, b);
       } else {
         return -1 * Math.pow(-1 * a, b);
@@ -309,15 +319,15 @@ var pow = function(a, b) {
   } catch (e) {
     return Math.pow(a, b);
   }
-}
+};
 var evaluateEquation = function(equationToEval, x) {
 
   var a = eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")));
   if (!isNaN(a)) {
     return parseFloat(parseFloat(eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")))).toFixed(8));
   } else {
-    return NaN
+    return NaN;
   }
   //return parseFloat(parseFloat(math.eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")))).toFixed(3));
-}
+};
 
