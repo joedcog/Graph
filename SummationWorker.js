@@ -5,7 +5,13 @@ self.addEventListener('message', function(e) {
   self.postMessage({ 'msg': 'Calculating Right Sum' });
   var rightSumValue = 0;
   var equationToEval = e.data.equationToEval;
-
+  var canIntegrate = function() {
+    if (equationToEval.match(/\//g) !== null || equationToEval.match(/sqrt/g) !== null) {
+      return false;
+    } else {
+      return true;
+    }
+  };
   var N = e.data.N;
   var a = e.data.a;
   var b = e.data.b;
@@ -61,14 +67,18 @@ self.addEventListener('message', function(e) {
     dataToPost.Left = leftSumValue;
   }
   if (e.data.type == "integral") {
-    
+
     self.postMessage({ 'msg': 'Calculating Integral' });
+    // if (canIntegrate()) {
+    //   console.log("integrate");
+    //   equationToEval.replace(/sin/g,"cos");
+    // } else {
     if (Array.isArray(a) && Array.isArray(b) && a.length == b.length) {
       dataToPost.Integral = [];
       for (l = 0; l < a.length; l++) {
         integralValue = 0;
         xVal = b[l];
-        
+
         tempY = 0;
         prevYVal = 0;
         for (i = 0; i < size * (b[l] - a[l]); i++) {
@@ -124,7 +134,7 @@ self.addEventListener('message', function(e) {
     } else {
       integralValue = 0;
       xVal = b;
-      
+
       tempY = 0;
       prevYVal = 0;
       for (i = 0; i < size * (b - a); i++) {
@@ -178,15 +188,16 @@ self.addEventListener('message', function(e) {
       dataToPost.Integral = integralValue;
     }
   }
+  //}
   if (e.data.type == "areaUnderCurve") {
-    
+
     self.postMessage({ 'msg': 'Calculating Integral' });
     if (Array.isArray(a) && Array.isArray(b) && a.length == b.length) {
       dataToPost.areaUnderCurve = [];
       for (l = 0; l < a.length; l++) {
         integralValue = 0;
         xVal = b[l];
-        
+
         tempY = 0;
         prevYVal = 0;
         for (i = 0; i < size * (b[l] - a[l]); i++) {
@@ -242,7 +253,7 @@ self.addEventListener('message', function(e) {
     } else {
       integralValue = 0;
       xVal = b;
-      
+
       tempY = 0;
       prevYVal = 0;
       for (i = 0; i < size * (b - a); i++) {
@@ -330,4 +341,3 @@ var evaluateEquation = function(equationToEval, x) {
   }
   //return parseFloat(parseFloat(math.eval(((equationToEval).replace(new RegExp("x", 'g'), "(" + x + ")")))).toFixed(3));
 };
-

@@ -1,5 +1,5 @@
 "use strict";
-var Graph = function(aobj) {
+var Grapher = function(aobj) {
   //Functions-----------------------------------------------------------------------------------------------
   //Determine if a number is a float
   var i = 0,
@@ -170,7 +170,13 @@ var Graph = function(aobj) {
   };
   //end Functions--------------------------------------------------------------------------------------------------
   //Object attributes----------------------------------------------------------------------------------------------
-
+  //new structures
+  if(aobj.graph !== "undefined"){
+    this.graph = aobj.graph;
+  } else {
+    this.graph = '';
+  }
+  //------------------------------------------------------
   //aobj.render used to determine if rendered as canvas or as svg
   //possible values: canvas, svg
   if (aobj.render) {
@@ -188,6 +194,7 @@ var Graph = function(aobj) {
   //aobj.equation is the equation or array of equations to evaluate and render graphs
   //possible values: a valid function string, predefined function names
   //predefined names: f, studentt, normal, chi-square, arcsine, exponential
+  
   if (typeof aobj.equation !== "undefined") {
     this.equation = aobj.equation;
   } else {
@@ -440,16 +447,27 @@ var Graph = function(aobj) {
 
   this.init = function() {
     this.namedEquations();
-    var figure, figcap, svg, axisSym, axisG, graphG, use, graphsym, canvas;
+    var figure, defs, clip, cliprect, figcap, svg, axisSym, axisG, graphG, use, graphsym, canvas;
     if (this.render == "svg") {
       figure = document.createElement('figure');
       figure.setAttribute('id', this.id + "figure");
       svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-
+      defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+      clip = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
+      cliprect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      
       svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
       svg.setAttribute('viewBox', "0 0 " + this.imageWidth + " " + this.imageHeight);
+      
       svg.setAttribute('width', this.imageWidth);
       svg.setAttribute('height', this.imageHeight);
+      cliprect.setAttribute('x', 20);
+      cliprect.setAttribute('y', 20);
+      cliprect.setAttribute('width', parseFloat(this.imageWidth) - 40);
+      cliprect.setAttribute('height', parseFloat(this.imageHeight) - 40);
+      clip.appendChild(cliprect);
+      defs.appendChild(clip);
+      svg.appendChild(defs);
       axisSym = document.createElementNS('http://www.w3.org/2000/svg', 'symbol');
       axisSym.setAttribute('id', this.id + "AxisSymbol");
 
