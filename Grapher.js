@@ -1,5 +1,6 @@
 "use strict";
 var Grapher = function(aobj) {
+  
   //Functions-----------------------------------------------------------------------------------------------
   //Determine if a number is a float
   var i = 0,
@@ -168,10 +169,12 @@ var Grapher = function(aobj) {
   var beta = function(z, zz) {
     return (gamma(z) * gamma(zz)) / gamma(z + zz);
   };
+  var worker;
+  var sumWork;
   //end Functions--------------------------------------------------------------------------------------------------
   //Object attributes----------------------------------------------------------------------------------------------
   //new structures
-  if(aobj.graph !== "undefined"){
+  if (aobj.graph !== "undefined") {
     this.graph = aobj.graph;
   } else {
     this.graph = '';
@@ -194,7 +197,7 @@ var Grapher = function(aobj) {
   //aobj.equation is the equation or array of equations to evaluate and render graphs
   //possible values: a valid function string, predefined function names
   //predefined names: f, studentt, normal, chi-square, arcsine, exponential
-  
+
   if (typeof aobj.equation !== "undefined") {
     this.equation = aobj.equation;
   } else {
@@ -455,10 +458,10 @@ var Grapher = function(aobj) {
       defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
       clip = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
       cliprect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      
+
       svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
       svg.setAttribute('viewBox', "0 0 " + this.imageWidth + " " + this.imageHeight);
-      
+
       svg.setAttribute('width', this.imageWidth);
       svg.setAttribute('height', this.imageHeight);
       cliprect.setAttribute('x', 20);
@@ -1110,10 +1113,13 @@ var Grapher = function(aobj) {
   this.drawGraph = function(equation) {
     var graphContent = document.getElementById(this.id + 'GraphContents');
     var gr = this;
-    var worker;
+
     var ctx = gr.ctx;
     var pointsContainer, image, image2, image3, image4, image5, image6, titleImage5, textNode, textNode2;
     if (gr.render == "svg") {
+      if (typeof worker === "object" && !Array.isArray(gr.equation)) {
+        worker.terminate();
+      }
       worker = new Worker('GraphWorker.js');
       worker.addEventListener('message', function(e) {
         if (e.data.error) {
@@ -1298,6 +1304,9 @@ var Grapher = function(aobj) {
       });
       worker.postMessage({ 'points': gr.points, 'pointsOnGraph': gr.pointsOnGraph, 'widthx': gr.widthx, 'widthy': gr.widthy, 'xScale': gr.xScale, 'yScale': gr.yScale, 'imageWidth': gr.imageWidth, 'imageHeight': gr.imageHeight, 'sidePadding': gr.sidePadding, 'TopBottomPadding': gr.TopBottomPadding, 'type': gr.type, 'equationToEval': equation, 'tinyX': gr.minX, 'largeX': gr.maxX, 'tinyY': gr.minY, 'largeY': gr.maxY, 'N': gr.N, 'a': gr.a, 'b': gr.b, 'shadeToX': gr.shadeToX });
     } else if (gr.render == "canvas") {
+      if (typeof worker === "object" && !Array.isArray(gr.equation)) {
+        worker.terminate();
+      }
       worker = new Worker('CanvasGraphWorker.js');
       worker.addEventListener('message', function(e) {
         if (e.data.error) {
@@ -1449,7 +1458,10 @@ var Grapher = function(aobj) {
     var a = this.a;
     var b = this.b;
     var gr = this;
-    var sumWork = new Worker("SummationWorker.js");
+    if (typeof sumWork === "object" && !Array.isArray(gr.equation)) {
+      sumWork.terminate();
+    }
+    sumWork = new Worker("SummationWorker.js");
     sumWork.addEventListener('message', function(e) {
       if (e.data.msg) {
         //$('#popup #stage').empty().append(e.data.msg);
